@@ -49,8 +49,9 @@
 - `id_cooperativa_produtor`
 - `id_produtor`
 - `id_cooperativa`
-
-**Imagem 1: Diagrama Entidade Relacionamento**  
+- 
+<p  align="center"><b>Imagem 1: Diagrama Entidade Relacionamento</b></p>
+ 
 ![](https://github.com/arlisson/Alqualis_cafe/blob/main/imagens_projeto/modelo_der.png)
 O diagrama de entidade e relacionamento descreve como o banco de dados será modelado e implementado.
 
@@ -59,8 +60,8 @@ O diagrama de entidade e relacionamento descreve como o banco de dados será mod
 
 ---
 
-## Tabela 1: Requisitos Funcionais do Sistema
 
+<p  align="center"><b>Imagem 1: Diagrama Entidade Relacionamento</b></p>
 | Código | Requisito Funcional                         | Descrição |
 |--------|---------------------------------------------|-----------|
 | RF-01  | Cadastro de Produtor                        | O sistema deve permitir o cadastro de produtores com nome e CPF. |
