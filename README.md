@@ -49,16 +49,17 @@
 - `id_cooperativa_produtor`
 - `id_produtor`
 - `id_cooperativa`
-
-**Imagem 1: Diagrama Entidade Relacionamento**  
+- 
+<p  align="center"><b>Imagem 1: Diagrama Entidade Relacionamento</b></p>
+ 
+![](https://github.com/arlisson/Alqualis_cafe/blob/main/imagens_projeto/modelo_der.png)
 O diagrama de entidade e relacionamento descreve como o banco de dados será modelado e implementado.
 
 ### Módulo 2: Exportar dados para planilha Excel
 - Exportar os dados registrados no sistema para uma planilha Excel.
 
+<p  align="center"><b>Tabela 1: Requisitos funcionais do sistema</b></p>
 ---
-
-## Tabela 1: Requisitos Funcionais do Sistema
 
 | Código | Requisito Funcional                         | Descrição |
 |--------|---------------------------------------------|-----------|
