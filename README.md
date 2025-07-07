@@ -51,6 +51,7 @@
 - `id_cooperativa`
 
 **Imagem 1: Diagrama Entidade Relacionamento**  
+![](https://github.com/arlisson/Alqualis_cafe/blob/main/imagens_projeto/modelo_der.png)
 O diagrama de entidade e relacionamento descreve como o banco de dados será modelado e implementado.
 
 ### Módulo 2: Exportar dados para planilha Excel
