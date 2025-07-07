@@ -58,10 +58,9 @@ O diagrama de entidade e relacionamento descreve como o banco de dados será mod
 ### Módulo 2: Exportar dados para planilha Excel
 - Exportar os dados registrados no sistema para uma planilha Excel.
 
+<p  align="center"><b>Tabela 1: Requisitos funcionais do sistema</b></p>
 ---
 
-
-<p  align="center"><b>Imagem 1: Diagrama Entidade Relacionamento</b></p>
 | Código | Requisito Funcional                         | Descrição |
 |--------|---------------------------------------------|-----------|
 | RF-01  | Cadastro de Produtor                        | O sistema deve permitir o cadastro de produtores com nome e CPF. |
