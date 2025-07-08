@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginVertical: RFValue(15),
     elevation: 3,
-    width: '80%',
+    width: '90%',
     alignSelf: 'center',
   },
   innerContent: {
