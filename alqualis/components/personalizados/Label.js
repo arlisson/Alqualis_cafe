@@ -26,6 +26,7 @@ export default function Label({
   onIconPress = null,
   value = '',
   onChangeText = () => {},
+  data,
 }) {
   if (horizontal) {
     return (
@@ -79,7 +80,10 @@ export default function Label({
       {dropdown && (
         <View style={stylesGeral.dropdownRow}>
           <View style={stylesGeral.dropdownWrapper}>
-            <DropdownComponent label={label} />
+            <DropdownComponent
+            label={label}
+            data={data}
+            onChange={onChangeText} />
           </View>
         </View>
       )}

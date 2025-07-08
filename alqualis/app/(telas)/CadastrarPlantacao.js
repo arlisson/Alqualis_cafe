@@ -115,6 +115,10 @@ export default function CadastrarPlantacao() {
     </TouchableOpacity>
   );
 
+
+  const handleSalvar =()=>{
+    console.log('OLá')
+  };
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom: RFValue(30) }}>
       <HeaderTitle texto='Cadastrar Plantação' voltar='true' home='true' />
@@ -193,7 +197,7 @@ export default function CadastrarPlantacao() {
         </Modal>
 
       </ViewCenter>
-      <Botao texto='Salvar' />
+      <Botao texto='Salvar' onPress={()=>handleSalvar()}/>
     </View>
   );
 }

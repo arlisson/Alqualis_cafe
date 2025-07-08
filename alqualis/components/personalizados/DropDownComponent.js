@@ -14,39 +14,37 @@ import { RFValue } from 'react-native-responsive-fontsize';
   //   { label: 'Item 8', value: '8' },
   // ];
 
-  const DropdownComponent = ({data=[], label='Selecioar'}) => {
-    const [value, setValue] = useState(null);
-    const [isFocus, setIsFocus] = useState(false);
+  const DropdownComponent = ({ data = [], label = 'Selecionar', onChange }) => {
+  const [isFocus, setIsFocus] = useState(false);
+  const [value, setValue] = useState(null);
 
-    
-    return (
-      <View style={styles.container}>
-   
-        <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={data}
-          search
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder={!isFocus ? 'Selecionar ' + label : '...'}
-          searchPlaceholder="Search..."
-          value={value}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={item => {
-            setValue(item.value);
-            setIsFocus(false);
-          }}
-          
-        />
-      </View>
-    );
-  };
+  return (
+    <View style={styles.container}>
+      <Dropdown
+        style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={data}
+        search
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder={!isFocus ? 'Selecionar ' + label : '...'}
+        searchPlaceholder="Buscar..."
+        value={value}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={(item) => {
+          setValue(item.value);
+          onChange(item);  // envia intem inteiro para o componente pai
+          setIsFocus(false);
+        }}
+      />
+    </View>
+  );
+};
 
   export default DropdownComponent;
 
