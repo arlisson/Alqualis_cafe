@@ -34,6 +34,10 @@ export default function CadastrarPlantacao() {
   const [comunidade, setComunidade] = useState(null);        // Ex: { label: 'Comunidade A', value: 'a' }
   const [municipio, setMunicipio] = useState(null);          // Ex: { label: 'Município X', value: 'x' }
 
+  const faces = ['Norte', 'Sul', 'Leste', 'Oeste', 'Noroeste', 'Nordeste', 'Sudoeste', 'Sudeste'];
+  const [facesSelecionadas, setFacesSelecionadas] = useState([]);
+  const [modalFaceVisible, setModalFaceVisible] = useState(false);
+
 
   /**
    * Alterna a seleção de um mês. Adiciona se não existir, remove se já estiver selecionado.
@@ -123,12 +127,34 @@ export default function CadastrarPlantacao() {
     </TouchableOpacity>
   );
 
+  const toggleFace = (face) => {
+  setFacesSelecionadas((prev) =>
+    prev.includes(face) ? prev.filter((f) => f !== face) : [...prev, face]
+  );
+};
+
+  const removerUltimaFace = () => {
+    setFacesSelecionadas((prev) => prev.slice(0, -1));
+  };
+
+  const limparTodasFaces = () => {
+    setFacesSelecionadas([]);
+  };
+
+  const renderFaces = ({ item }) => (
+    <TouchableOpacity onPress={() => toggleFace(item)} style={styles.mesItem}>
+      <Text style={{ color: facesSelecionadas.includes(item) ? 'blue' : 'black' }}>{item}</Text>
+    </TouchableOpacity>
+  );
+
+  const facesFormatadas = facesSelecionadas.join(', ');
 
   const handleSalvar = () => {
   console.log('--- Dados da Plantação ---');
   console.log(`Nome da Propriedade: ${nomePropriedade}`);
   console.log(`Nome do Talhão: ${nomeTalhao}`);
-  
+  console.log(`Face de Exposição: ${facesSelecionadas.join(', ')}`);
+
   console.log(`Produtor: ${produtor?.label || 'N/A'} (value: ${produtor?.value || 'N/A'})`);
   console.log(`Variedade Plantada: ${variedade?.label || 'N/A'} (value: ${variedade?.value || 'N/A'})`);
   console.log(`Comunidade: ${comunidade?.label || 'N/A'} (value: ${comunidade?.value || 'N/A'})`);
@@ -173,6 +199,49 @@ export default function CadastrarPlantacao() {
       <ViewCenter>
         <Label label='Nome da propriedade' input={true} value={nomePropriedade} onChangeText={setNomePropriedade} />
         <Label label='Nome do Talhão' input={true} value={nomeTalhao} onChangeText={setNomeTalhao} />
+
+        <Label
+          label="Face de Exposição"
+          selectableInput
+          value={facesSelecionadas.join(', ')}
+          onChangeText={() => {}}
+          modalVisible={modalFaceVisible}
+          setModalVisible={setModalFaceVisible}
+          mainIconName="compass-outline"
+          onPressMainIcon={() => setModalFaceVisible(true)}
+          extraIcon={
+            facesSelecionadas.length > 0 && (
+              <TouchableOpacity onPress={() => setFacesSelecionadas((prev) => prev.slice(0, -1))} style={{ marginLeft: 10 }}>
+                <Ionicons name="backspace-outline" size={20} color="#cc0000" />
+              </TouchableOpacity>
+            )
+          }
+          renderModalContent={() => (
+            <>
+              <FlatList
+                data={faces}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setFacesSelecionadas((prev) =>
+                        prev.includes(item) ? prev.filter((f) => f !== item) : [...prev, item]
+                      )
+                    }
+                    style={{ paddingVertical: 10 }}
+                  >
+                    <Text style={{ color: facesSelecionadas.includes(item) ? 'blue' : 'black' }}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity onPress={() => setFacesSelecionadas([])} style={{ marginTop: 10}}>
+                <Text style={{ color: '#cc0000', textAlign: 'center' }}>Limpar Todos</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        />
+
+
         <Label label='Produtor' dropdown={true} value={produtor} onChangeText={setProdutor} data={dadosProdutores} />
         <Label label='Variedade Plantada' dropdown={true} value={variedade} onChangeText={setVariedade} data={dadosVariedades} />
         <Label label='Comunidade' dropdown={true} value={comunidade} onChangeText={setComunidade} data={dadosComunidades} />
@@ -184,50 +253,50 @@ export default function CadastrarPlantacao() {
         <Label label='Altitude' input={true} horizontal={true} value={altitude} onChangeText={setAltitude} />
 
         <Botao texto='Pegar localização' foto='pin-outline' onPress={pegarLocalizacao} />
-        <Botao texto='Selecionar no mapa' foto='map-outline' onPress={abrirMapa} />
-
-        <View style={styles.inputIconContainer}>
-          <View style={{ flex: 1, overflow: 'hidden' }}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <TextInput
-                style={styles.inputMeses}
-                placeholder="Meses de Colheita"
-                value={mesesFormatados}
-                editable={false}
-                scrollEnabled={false}
-              />
-            </ScrollView>
-          </View>
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Ionicons name="calendar-outline" size={RFValue(20)} color="#000" />
-          </TouchableOpacity>
-          {mesesSelecionados.length > 0 && (
-            <TouchableOpacity onPress={removerUltimoMes} style={{ marginLeft: 10 }}>
-              <Ionicons name="backspace-outline" size={20} color="#cc0000" />
-            </TouchableOpacity>
-          )}
-        </View>
-
-
-
-        <Modal visible={modalVisible} animationType="slide" transparent>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Selecione os meses</Text>
+        <Botao texto='Selecionar no mapa' foto='map-outline' onPress={abrirMapa} />       
+        <Label
+          label="Meses de Colheita"
+          selectableInput
+          value={mesesSelecionados.join(', ')}
+          onChangeText={(text) => {}}
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          mainIconName="calendar-outline"
+          onPressMainIcon={() => setModalVisible(true)}
+          extraIcon={
+            mesesSelecionados.length > 0 && (
+              <TouchableOpacity onPress={() => setMesesSelecionados((prev) => prev.slice(0, -1))} style={{ marginLeft: 10 }}>
+                <Ionicons name="backspace-outline" size={20} color="#cc0000" />
+              </TouchableOpacity>
+            )
+          }
+          renderModalContent={() => (
+            <>
               <FlatList
                 data={meses}
                 keyExtractor={(item) => item}
-                renderItem={renderMeses}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setMesesSelecionados((prev) =>
+                        prev.includes(item) ? prev.filter((m) => m !== item) : [...prev, item]
+                      )
+                    }
+                    style={{ paddingVertical: 10 }}
+                  >
+                    <Text style={{ color: mesesSelecionados.includes(item) ? 'blue' : 'black' }}>{item}</Text>
+                  </TouchableOpacity>
+                )}
               />
-              <TouchableOpacity onPress={limparTodosMeses} style={styles.btnLimpar}>
-                <Text style={{ color: '#cc0000' }}>Limpar Todos</Text>
+              <TouchableOpacity onPress={() => setMesesSelecionados([])} style={{ marginTop: 10 }}>
+                <Text style={{ color: '#cc0000', textAlign: 'center' }}>Limpar Todos</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.btnFechar}>
-                <Text style={{ color: 'white' }}>Fechar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+            </>
+          )}
+        />
+
+
+       
 
         <Modal visible={mapVisible} animationType="slide">
           <View style={{ flex: 1 }}>
@@ -248,6 +317,8 @@ export default function CadastrarPlantacao() {
             </TouchableOpacity>
           </View>
         </Modal>
+      
+
 
       </ViewCenter>
       <Botao texto='Salvar' onPress={()=>handleSalvar()}/>

@@ -1,50 +1,59 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
 import DropdownComponent from './DropDownComponent';
 import stylesGeral from '../../assets/styles/stylesGeral';
 
 /**
- * Componente de label reutilizável com input ou dropdown, vertical ou horizontal.
+ * Componente reutilizável de campo com label, podendo ser:
+ * - input de texto normal
+ * - dropdown de seleção
+ * - input somente leitura com seleção via modal
  *
- * @param {string} label - Texto exibido como label.
- * @param {boolean} input - Se verdadeiro, exibe um TextInput.
- * @param {boolean} dropdown - Se verdadeiro, exibe um Dropdown.
- * @param {boolean} horizontal - Exibe o label e input na horizontal.
- * @param {string|null} icon - Nome do ícone do Ionicons.
- * @param {function|null} onIconPress - Função chamada ao pressionar o ícone.
- * @param {string} value - Valor exibido no TextInput.
- * @param {function} onChangeText - Função ao mudar o texto do input.
+ * @param {string} label - Texto exibido acima do campo
+ * @param {boolean} input - Exibe TextInput normal
+ * @param {boolean} dropdown - Exibe Dropdown com lista de seleção
+ * @param {boolean} selectableInput - Exibe campo readonly com modal de seleção
+ * @param {boolean} horizontal - Layout horizontal (label ao lado)
+ * @param {string|null} icon - Ícone ao lado do campo (somente para `input`)
+ * @param {function|null} onIconPress - Ação ao pressionar ícone
+ * @param {string} value - Valor do campo
+ * @param {function} onChangeText - Função para atualizar o valor
+ * @param {array} data - Dados do dropdown
+ * @param {string} mainIconName - Nome do Ionicon principal (para `selectableInput`)
+ * @param {function} onPressMainIcon - Ação ao pressionar o ícone principal
+ * @param {JSX.Element|null} extraIcon - Ícone extra (ex: botão de limpar)
+ * @param {boolean} modalVisible - Visibilidade do modal (para `selectableInput`)
+ * @param {function} setModalVisible - Função para alterar a visibilidade do modal
+ * @param {function} renderModalContent - Conteúdo personalizado do modal
  */
 export default function Label({
   label = 'Label',
   input = false,
   dropdown = false,
+  selectableInput = false,
   horizontal = false,
   icon = null,
   onIconPress = null,
   value = '',
   onChangeText = () => {},
-  data,
+  data = [],
+  mainIconName = null,
+  onPressMainIcon = null,
+  extraIcon = null,
+  modalVisible = false,
+  setModalVisible = () => {},
+  renderModalContent = null,
 }) {
-
-  /**
- * Busca dentro de um array de dados o item cujo `label` ou `value` coincida com o parâmetro fornecido,
- * e retorna o objeto completo.
- * 
- * @param {string} labelOuValue - Pode ser o `label` ("Cooperativa 3") ou o `value` ("3").
- * @param {Array} dataArray - Lista de objetos com { label, value }.
- * @returns {object|null} Objeto completo ou null.
- */
-const getItemByLabelOrValue = (labelOuValue, dataArray) => {
-  return dataArray.find(
-    (item) => item.label === labelOuValue || item.value === labelOuValue
-  ) || null;
-};
-
-
-
   if (horizontal) {
     return (
       <View style={styles.horizontalRow}>
@@ -100,13 +109,52 @@ const getItemByLabelOrValue = (labelOuValue, dataArray) => {
             <DropdownComponent
               label={label}
               data={data}
-              value={value}           // objeto completo
-              onChange={onChangeText} // função que recebe o objeto completo
+              value={value}
+              onChange={onChangeText}
             />
-
-
           </View>
         </View>
+      )}
+
+      {selectableInput && (
+        <>
+          <View style={styles.inputIconContainer}>
+            <View style={{ flex: 1, overflow: 'hidden' }}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <TextInput
+                  style={styles.inputReadonly}
+                  placeholder={label}
+                  value={value}
+                  editable={false}
+                  scrollEnabled={false}
+                />
+              </ScrollView>
+            </View>
+
+            {mainIconName && (
+              <TouchableOpacity onPress={onPressMainIcon}>
+                <Ionicons name={mainIconName} size={RFValue(20)} color="#000" />
+              </TouchableOpacity>
+            )}
+
+            {extraIcon}
+          </View>
+
+          <Modal visible={modalVisible} animationType="slide" transparent>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>{`Selecione ${label}`}</Text>
+                {renderModalContent && renderModalContent()}
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.btnFechar}
+                >
+                  <Text style={{ color: 'white' }}>Fechar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        </>
       )}
     </View>
   );
@@ -136,6 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: RFValue(8),
     paddingHorizontal: RFValue(12),
     backgroundColor: '#fff',
+    fontSize: RFValue(14),
   },
   icon: {
     marginLeft: RFValue(10),
@@ -157,5 +206,44 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  inputIconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: RFValue(10),
+    backgroundColor: '#fff',
+    height: RFValue(40),
+    justifyContent: 'space-between',
+  },
+  inputReadonly: {
+    flex: 1,
+    fontSize: RFValue(14),
+    color: '#000',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    marginHorizontal: 30,
+    borderRadius: 10,
+    padding: 20,
+    maxHeight: '70%',
+  },
+  modalTitle: {
+    fontSize: RFValue(18),
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  btnFechar: {
+    marginTop: 10,
+    backgroundColor: '#4CAF50',    
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 6,
   },
 });
