@@ -28,6 +28,23 @@ export default function Label({
   onChangeText = () => {},
   data,
 }) {
+
+  /**
+ * Busca dentro de um array de dados o item cujo `label` ou `value` coincida com o parâmetro fornecido,
+ * e retorna o objeto completo.
+ * 
+ * @param {string} labelOuValue - Pode ser o `label` ("Cooperativa 3") ou o `value` ("3").
+ * @param {Array} dataArray - Lista de objetos com { label, value }.
+ * @returns {object|null} Objeto completo ou null.
+ */
+const getItemByLabelOrValue = (labelOuValue, dataArray) => {
+  return dataArray.find(
+    (item) => item.label === labelOuValue || item.value === labelOuValue
+  ) || null;
+};
+
+
+
   if (horizontal) {
     return (
       <View style={styles.horizontalRow}>
@@ -81,9 +98,13 @@ export default function Label({
         <View style={stylesGeral.dropdownRow}>
           <View style={stylesGeral.dropdownWrapper}>
             <DropdownComponent
-            label={label}
-            data={data}
-            onChange={onChangeText} />
+              label={label}
+              data={data}
+              value={value}           // objeto completo
+              onChange={onChangeText} // função que recebe o objeto completo
+            />
+
+
           </View>
         </View>
       )}

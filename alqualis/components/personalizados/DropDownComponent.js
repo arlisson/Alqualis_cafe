@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -14,9 +14,14 @@ import { RFValue } from 'react-native-responsive-fontsize';
   //   { label: 'Item 8', value: '8' },
   // ];
 
-  const DropdownComponent = ({ data = [], label = 'Selecionar', onChange }) => {
+  const DropdownComponent = ({ data = [], label = 'Selecionar', onChange, value }) => {
   const [isFocus, setIsFocus] = useState(false);
-  const [value, setValue] = useState(null);
+  const [internalValue, setInternalValue] = useState(value?.value || null); // valor primitivo do objeto
+
+  useEffect(() => {
+    // Sempre que o objeto mudar, atualiza o valor com seu .value
+    setInternalValue(value?.value || null);
+  }, [value]);
 
   return (
     <View style={styles.container}>
@@ -33,18 +38,19 @@ import { RFValue } from 'react-native-responsive-fontsize';
         valueField="value"
         placeholder={!isFocus ? 'Selecionar ' + label : '...'}
         searchPlaceholder="Buscar..."
-        value={value}
+        value={internalValue} // apenas o .value
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
-          setValue(item.value);
-          onChange(item);  // envia intem inteiro para o componente pai
+          setInternalValue(item.value);    // atualiza o valor exibido
+          onChange(item);                  // envia o objeto completo { label, value }
           setIsFocus(false);
         }}
       />
     </View>
   );
 };
+
 
   export default DropdownComponent;
 

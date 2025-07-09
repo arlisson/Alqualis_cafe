@@ -13,7 +13,8 @@ export default function CadastrarProdutor() {
   const [nomeProdutor,setNomeProdutor] = useState('');
   const [cpfProdutor,setCpfProdutor] = useState('');
   const [codigoProdutor,setCodigoProdutor] = useState('');
-  const [cooperativa,setCooperativa] = useState('');
+  const [cooperativa, setCooperativa] = useState('');
+
 
   const handleSalvar =()=>{
     console.log(`Nome Produtor: ${nomeProdutor}\n
@@ -43,11 +44,11 @@ export default function CadastrarProdutor() {
         <Label
           label='Cooperativa'
           dropdown={true}
-          data={data}          
+          data={data} 
+          value={cooperativa}         
           onChangeText={setCooperativa}
         />
-
-        
+                
       </ViewCenter>
       <Botao texto='Salvar'onPress={()=>handleSalvar()}/>
       
