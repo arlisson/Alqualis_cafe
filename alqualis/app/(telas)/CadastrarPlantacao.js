@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet,
-  TextInput, Modal, TouchableOpacity, FlatList, Alert
+  TextInput, Modal, TouchableOpacity, FlatList, Alert, ScrollView
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -26,6 +26,14 @@ export default function CadastrarPlantacao() {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [altitude, setAltitude] = useState('');
+  const [nomePropriedade, setNomePropriedade] = useState('');
+  const [nomeTalhao, setNomeTalhao] = useState('');
+
+  const [produtor, setProdutor] = useState(null);            // Ex: { label: 'João', value: '1' }
+  const [variedade, setVariedade] = useState(null);          // Ex: { label: 'BRS Capiaçu', value: 'capiaçu' }
+  const [comunidade, setComunidade] = useState(null);        // Ex: { label: 'Comunidade A', value: 'a' }
+  const [municipio, setMunicipio] = useState(null);          // Ex: { label: 'Município X', value: 'x' }
+
 
   /**
    * Alterna a seleção de um mês. Adiciona se não existir, remove se já estiver selecionado.
@@ -116,19 +124,60 @@ export default function CadastrarPlantacao() {
   );
 
 
-  const handleSalvar =()=>{
-    console.log('OLá')
-  };
+  const handleSalvar = () => {
+  console.log('--- Dados da Plantação ---');
+  console.log(`Nome da Propriedade: ${nomePropriedade}`);
+  console.log(`Nome do Talhão: ${nomeTalhao}`);
+  
+  console.log(`Produtor: ${produtor?.label || 'N/A'} (value: ${produtor?.value || 'N/A'})`);
+  console.log(`Variedade Plantada: ${variedade?.label || 'N/A'} (value: ${variedade?.value || 'N/A'})`);
+  console.log(`Comunidade: ${comunidade?.label || 'N/A'} (value: ${comunidade?.value || 'N/A'})`);
+  console.log(`Município: ${municipio?.label || 'N/A'} (value: ${municipio?.value || 'N/A'})`);
+  
+  console.log(`Latitude: ${latitude}`);
+  console.log(`Longitude: ${longitude}`);
+  console.log(`Altitude: ${altitude}`);
+  console.log(`Meses de Colheita: ${mesesSelecionados.join(', ')}`);
+};
+
+
+
+  const dadosProdutores = [
+    { label: 'Cooperativa 1', value: '1' },
+    { label: 'Cooperativa 2', value: '2' },
+    { label: 'Cooperativa 3', value: '3' },   
+  ];
+    const dadosVariedades = [
+    { label: 'Cooperativa 1', value: '1' },
+    { label: 'Cooperativa 2', value: '2' },
+    { label: 'Cooperativa 3', value: '3' },   
+  ];
+
+  const dadosComunidades = [
+    { label: 'Cooperativa 1', value: '1' },
+    { label: 'Cooperativa 2', value: '2' },
+    { label: 'Cooperativa 3', value: '3' },   
+  ];
+
+    const dadosMunicipios = [
+    { label: 'Cooperativa 1', value: '1' },
+    { label: 'Cooperativa 2', value: '2' },
+    { label: 'Cooperativa 3', value: '3' },   
+  ];
+
+
+
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom: RFValue(30) }}>
       <HeaderTitle texto='Cadastrar Plantação' voltar='true' home='true' />
       <ViewCenter>
-        <Label label='Nome da propriedade' input={true} />
-        <Label label='Nome do Talhão' input={true} />
-        <Label label='Produtor' dropdown={true} />
-        <Label label='Variedade Plantada' dropdown={true} />
-        <Label label='Comunidade' dropdown={true} />
-        <Label label='Município' dropdown={true} />
+        <Label label='Nome da propriedade' input={true} value={nomePropriedade} onChangeText={setNomePropriedade} />
+        <Label label='Nome do Talhão' input={true} value={nomeTalhao} onChangeText={setNomeTalhao} />
+        <Label label='Produtor' dropdown={true} value={produtor} onChangeText={setProdutor} data={dadosProdutores} />
+        <Label label='Variedade Plantada' dropdown={true} value={variedade} onChangeText={setVariedade} data={dadosVariedades} />
+        <Label label='Comunidade' dropdown={true} value={comunidade} onChangeText={setComunidade} data={dadosComunidades} />
+        <Label label='Município' dropdown={true} value={municipio} onChangeText={setMunicipio} data={dadosMunicipios} />
+
 
         <Label label='Latitude' input={true} horizontal={true} value={latitude} onChangeText={setLatitude} />
         <Label label='Longitude' input={true} horizontal={true} value={longitude} onChangeText={setLongitude} />
@@ -137,25 +186,29 @@ export default function CadastrarPlantacao() {
         <Botao texto='Pegar localização' foto='pin-outline' onPress={pegarLocalizacao} />
         <Botao texto='Selecionar no mapa' foto='map-outline' onPress={abrirMapa} />
 
-        <View style={styles.labelMesesContainer}>
-          <Text style={styles.labelMeses}>Meses de Colheita</Text>
-          <View style={styles.inputIconContainer}>
-            <TextInput
-              style={styles.inputMeses}
-              placeholder="Meses de Colheita"
-              value={mesesFormatados}
-              editable={false}
-            />
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Ionicons name="calendar-outline" size={RFValue(20)} color="#000" />
-            </TouchableOpacity>
-            {mesesSelecionados.length > 0 && (
-              <TouchableOpacity onPress={removerUltimoMes} style={{ marginLeft: 10 }}>
-                <Ionicons name="backspace-outline" size={20} color="#cc0000" />
-              </TouchableOpacity>
-            )}
+        <View style={styles.inputIconContainer}>
+          <View style={{ flex: 1, overflow: 'hidden' }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <TextInput
+                style={styles.inputMeses}
+                placeholder="Meses de Colheita"
+                value={mesesFormatados}
+                editable={false}
+                scrollEnabled={false}
+              />
+            </ScrollView>
           </View>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Ionicons name="calendar-outline" size={RFValue(20)} color="#000" />
+          </TouchableOpacity>
+          {mesesSelecionados.length > 0 && (
+            <TouchableOpacity onPress={removerUltimoMes} style={{ marginLeft: 10 }}>
+              <Ionicons name="backspace-outline" size={20} color="#cc0000" />
+            </TouchableOpacity>
+          )}
         </View>
+
+
 
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={styles.modalOverlay}>
@@ -263,4 +316,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#cc0000',
   },
+  inputMeses: {
+  fontSize: RFValue(14),
+  color: '#000',
+  paddingRight: RFValue(10),
+  paddingVertical: 0,
+  width:'90%'
+},
+
 });
