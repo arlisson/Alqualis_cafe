@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
+  FlatList,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,27 +15,10 @@ import DropdownComponent from './DropDownComponent';
 import stylesGeral from '../../assets/styles/stylesGeral';
 
 /**
- * Componente reutilizável de campo com label, podendo ser:
- * - input de texto normal
- * - dropdown de seleção
- * - input somente leitura com seleção via modal
- *
- * @param {string} label - Texto exibido acima do campo
- * @param {boolean} input - Exibe TextInput normal
- * @param {boolean} dropdown - Exibe Dropdown com lista de seleção
- * @param {boolean} selectableInput - Exibe campo readonly com modal de seleção
- * @param {boolean} horizontal - Layout horizontal (label ao lado)
- * @param {string|null} icon - Ícone ao lado do campo (somente para `input`)
- * @param {function|null} onIconPress - Ação ao pressionar ícone
- * @param {string} value - Valor do campo
- * @param {function} onChangeText - Função para atualizar o valor
- * @param {array} data - Dados do dropdown
- * @param {string} mainIconName - Nome do Ionicon principal (para `selectableInput`)
- * @param {function} onPressMainIcon - Ação ao pressionar o ícone principal
- * @param {JSX.Element|null} extraIcon - Ícone extra (ex: botão de limpar)
- * @param {boolean} modalVisible - Visibilidade do modal (para `selectableInput`)
- * @param {function} setModalVisible - Função para alterar a visibilidade do modal
- * @param {function} renderModalContent - Conteúdo personalizado do modal
+ * Componente reutilizável de campo com label:
+ * - input comum
+ * - dropdown
+ * - input somente leitura com seleção múltipla interna via modal
  */
 export default function Label({
   label = 'Label',
@@ -50,10 +34,53 @@ export default function Label({
   mainIconName = null,
   onPressMainIcon = null,
   extraIcon = null,
-  modalVisible = false,
-  setModalVisible = () => {},
+  modalVisible: externalModalVisible = null,
+  setModalVisible: externalSetModalVisible = null,
   renderModalContent = null,
+  options = [], // para uso interno do selectableInput
 }) {
+  const [internalModalVisible, setInternalModalVisible] = useState(false);
+ 
+  const isExternal = Array.isArray(value) && typeof onChangeText === 'function';
+  const [internalSelectedItems, setInternalSelectedItems] = useState([]);
+  const selectedItems = isExternal ? value : internalSelectedItems;
+  const setSelectedItems = isExternal ? onChangeText : setInternalSelectedItems;
+
+
+  const modalVisible = externalModalVisible ?? internalModalVisible;
+  const setModalVisible = externalSetModalVisible ?? setInternalModalVisible;
+
+  const handleToggleItem = (item) => {
+    setSelectedItems((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+    );
+  };
+
+  const handleClearAll = () => setSelectedItems([]);
+
+  const internalModalContent = () => (
+    <>
+      <FlatList
+        data={options}
+        keyExtractor={(item) => item}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => handleToggleItem(item)}
+            style={{ paddingVertical: 10 }}
+          >
+            <Text style={{ color: selectedItems.includes(item) ? 'blue' : 'black' }}>{item}</Text>
+          </TouchableOpacity>
+        )}
+      />
+      <TouchableOpacity onPress={handleClearAll} style={{ marginTop: 10 }}>
+        <Text style={{ color: '#cc0000', textAlign: 'center' }}>Limpar Todos</Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  const displayValue = Array.isArray(selectedItems) ? selectedItems.join(', ') : '';
+
+
   if (horizontal) {
     return (
       <View style={styles.horizontalRow}>
@@ -124,31 +151,36 @@ export default function Label({
                 <TextInput
                   style={styles.inputReadonly}
                   placeholder={label}
-                  value={value}
+                  value={displayValue}
                   editable={false}
                   scrollEnabled={false}
                 />
               </ScrollView>
             </View>
-
             {mainIconName && (
-              <TouchableOpacity onPress={onPressMainIcon}>
+              <TouchableOpacity onPress={onPressMainIcon ?? (() => setModalVisible(true))}>
                 <Ionicons name={mainIconName} size={RFValue(20)} color="#000" />
               </TouchableOpacity>
             )}
+            {Array.isArray(selectedItems) && selectedItems.length > 0 && (
+              extraIcon ?? (
+                <TouchableOpacity
+                  onPress={() => setSelectedItems((prev) => prev.slice(0, -1))}
+                  style={{ marginLeft: 10 }}
+                >
+                  <Ionicons name="backspace-outline" size={20} color="#cc0000" />
+                </TouchableOpacity>
+              )
+            )}
 
-            {extraIcon}
           </View>
 
           <Modal visible={modalVisible} animationType="slide" transparent>
             <View style={styles.modalOverlay}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>{`Selecione ${label}`}</Text>
-                {renderModalContent && renderModalContent()}
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  style={styles.btnFechar}
-                >
+                {(renderModalContent || internalModalContent)()}
+                <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.btnFechar}>
                   <Text style={{ color: 'white' }}>Fechar</Text>
                 </TouchableOpacity>
               </View>
@@ -241,7 +273,7 @@ const styles = StyleSheet.create({
   },
   btnFechar: {
     marginTop: 10,
-    backgroundColor: '#4CAF50',    
+    backgroundColor: '#4CAF50',
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 6,

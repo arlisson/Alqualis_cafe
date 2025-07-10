@@ -19,7 +19,8 @@ export default function CadastrarPlantacao() {
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const faces = ['Norte', 'Sul', 'Leste', 'Oeste', 'Noroeste', 'Nordeste', 'Sudoeste', 'Sudeste'];
+
   const [mapVisible, setMapVisible] = useState(false);
   const [mapRegion, setMapRegion] = useState(null);
   const [mesesSelecionados, setMesesSelecionados] = useState([]);
@@ -33,35 +34,10 @@ export default function CadastrarPlantacao() {
   const [variedade, setVariedade] = useState(null);          // Ex: { label: 'BRS Capiaçu', value: 'capiaçu' }
   const [comunidade, setComunidade] = useState(null);        // Ex: { label: 'Comunidade A', value: 'a' }
   const [municipio, setMunicipio] = useState(null);          // Ex: { label: 'Município X', value: 'x' }
-
-  const faces = ['Norte', 'Sul', 'Leste', 'Oeste', 'Noroeste', 'Nordeste', 'Sudoeste', 'Sudeste'];
+  
   const [facesSelecionadas, setFacesSelecionadas] = useState([]);
-  const [modalFaceVisible, setModalFaceVisible] = useState(false);
 
 
-  /**
-   * Alterna a seleção de um mês. Adiciona se não existir, remove se já estiver selecionado.
-   * @param {string} mes - Mês a ser alternado na lista.
-   */
-  const toggleMes = (mes) => {
-    setMesesSelecionados((prev) =>
-      prev.includes(mes) ? prev.filter((m) => m !== mes) : [...prev, mes]
-    );
-  };
-
-  /**
-   * Remove o último mês adicionado na lista de meses selecionados.
-   */
-  const removerUltimoMes = () => {
-    setMesesSelecionados((prev) => prev.slice(0, -1));
-  };
-
-  /**
-   * Limpa todos os meses da lista de selecionados.
-   */
-  const limparTodosMeses = () => {
-    setMesesSelecionados([]);
-  };
 
   /**
    * Pega a localização atual do usuário usando GPS e preenche latitude, longitude e altitude.
@@ -113,47 +89,14 @@ export default function CadastrarPlantacao() {
     setAltitude('N/A');
     setMapVisible(false);
   };
-
-  const mesesFormatados = mesesSelecionados.join(', ');
-
-  /**
-   * Renderiza um item da lista de meses para seleção.
-   * @param {Object} item - Item contendo o nome do mês.
-   * @returns {JSX.Element} Componente TouchableOpacity com o nome do mês.
-   */
-  const renderMeses = ({ item }) => (
-    <TouchableOpacity onPress={() => toggleMes(item)} style={styles.mesItem}>
-      <Text style={{ color: mesesSelecionados.includes(item) ? 'blue' : 'black' }}>{item}</Text>
-    </TouchableOpacity>
-  );
-
-  const toggleFace = (face) => {
-  setFacesSelecionadas((prev) =>
-    prev.includes(face) ? prev.filter((f) => f !== face) : [...prev, face]
-  );
-};
-
-  const removerUltimaFace = () => {
-    setFacesSelecionadas((prev) => prev.slice(0, -1));
-  };
-
-  const limparTodasFaces = () => {
-    setFacesSelecionadas([]);
-  };
-
-  const renderFaces = ({ item }) => (
-    <TouchableOpacity onPress={() => toggleFace(item)} style={styles.mesItem}>
-      <Text style={{ color: facesSelecionadas.includes(item) ? 'blue' : 'black' }}>{item}</Text>
-    </TouchableOpacity>
-  );
-
-  const facesFormatadas = facesSelecionadas.join(', ');
+  
+  
 
   const handleSalvar = () => {
   console.log('--- Dados da Plantação ---');
   console.log(`Nome da Propriedade: ${nomePropriedade}`);
   console.log(`Nome do Talhão: ${nomeTalhao}`);
-  console.log(`Face de Exposição: ${facesSelecionadas.join(', ')}`);
+  console.log(`Face de Exposição: ${facesSelecionadas}`);
 
   console.log(`Produtor: ${produtor?.label || 'N/A'} (value: ${produtor?.value || 'N/A'})`);
   console.log(`Variedade Plantada: ${variedade?.label || 'N/A'} (value: ${variedade?.value || 'N/A'})`);
@@ -163,7 +106,7 @@ export default function CadastrarPlantacao() {
   console.log(`Latitude: ${latitude}`);
   console.log(`Longitude: ${longitude}`);
   console.log(`Altitude: ${altitude}`);
-  console.log(`Meses de Colheita: ${mesesSelecionados.join(', ')}`);
+  console.log(`Meses de Colheita: ${mesesSelecionados}`);
 };
 
 
@@ -203,44 +146,11 @@ export default function CadastrarPlantacao() {
         <Label
           label="Face de Exposição"
           selectableInput
-          value={facesSelecionadas.join(', ')}
-          onChangeText={() => {}}
-          modalVisible={modalFaceVisible}
-          setModalVisible={setModalFaceVisible}
+          options={faces}
           mainIconName="compass-outline"
-          onPressMainIcon={() => setModalFaceVisible(true)}
-          extraIcon={
-            facesSelecionadas.length > 0 && (
-              <TouchableOpacity onPress={() => setFacesSelecionadas((prev) => prev.slice(0, -1))} style={{ marginLeft: 10 }}>
-                <Ionicons name="backspace-outline" size={20} color="#cc0000" />
-              </TouchableOpacity>
-            )
-          }
-          renderModalContent={() => (
-            <>
-              <FlatList
-                data={faces}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      setFacesSelecionadas((prev) =>
-                        prev.includes(item) ? prev.filter((f) => f !== item) : [...prev, item]
-                      )
-                    }
-                    style={{ paddingVertical: 10 }}
-                  >
-                    <Text style={{ color: facesSelecionadas.includes(item) ? 'blue' : 'black' }}>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-              <TouchableOpacity onPress={() => setFacesSelecionadas([])} style={{ marginTop: 10}}>
-                <Text style={{ color: '#cc0000', textAlign: 'center' }}>Limpar Todos</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          value={facesSelecionadas}
+          onChangeText={(valArray) => setFacesSelecionadas(valArray)} // agora o componente atualiza seu estado real
         />
-
 
         <Label label='Produtor' dropdown={true} value={produtor} onChangeText={setProdutor} data={dadosProdutores} />
         <Label label='Variedade Plantada' dropdown={true} value={variedade} onChangeText={setVariedade} data={dadosVariedades} />
@@ -253,50 +163,16 @@ export default function CadastrarPlantacao() {
         <Label label='Altitude' input={true} horizontal={true} value={altitude} onChangeText={setAltitude} />
 
         <Botao texto='Pegar localização' foto='pin-outline' onPress={pegarLocalizacao} />
-        <Botao texto='Selecionar no mapa' foto='map-outline' onPress={abrirMapa} />       
+        <Botao texto='Selecionar no mapa' foto='map-outline' onPress={abrirMapa} />    
+
         <Label
           label="Meses de Colheita"
           selectableInput
-          value={mesesSelecionados.join(', ')}
-          onChangeText={(text) => {}}
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
+          options={meses}
+          value={mesesSelecionados}
+          onChangeText={(valArray) => setMesesSelecionados(valArray)} // agora o componente atualiza seu estado real
           mainIconName="calendar-outline"
-          onPressMainIcon={() => setModalVisible(true)}
-          extraIcon={
-            mesesSelecionados.length > 0 && (
-              <TouchableOpacity onPress={() => setMesesSelecionados((prev) => prev.slice(0, -1))} style={{ marginLeft: 10 }}>
-                <Ionicons name="backspace-outline" size={20} color="#cc0000" />
-              </TouchableOpacity>
-            )
-          }
-          renderModalContent={() => (
-            <>
-              <FlatList
-                data={meses}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      setMesesSelecionados((prev) =>
-                        prev.includes(item) ? prev.filter((m) => m !== item) : [...prev, item]
-                      )
-                    }
-                    style={{ paddingVertical: 10 }}
-                  >
-                    <Text style={{ color: mesesSelecionados.includes(item) ? 'blue' : 'black' }}>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-              <TouchableOpacity onPress={() => setMesesSelecionados([])} style={{ marginTop: 10 }}>
-                <Text style={{ color: '#cc0000', textAlign: 'center' }}>Limpar Todos</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        />
-
-
-       
+        />   
 
         <Modal visible={mapVisible} animationType="slide">
           <View style={{ flex: 1 }}>
@@ -316,8 +192,7 @@ export default function CadastrarPlantacao() {
               <Text style={{ color: 'white', textAlign: 'center' }}>Fechar mapa</Text>
             </TouchableOpacity>
           </View>
-        </Modal>
-      
+        </Modal>      
 
 
       </ViewCenter>
@@ -325,74 +200,3 @@ export default function CadastrarPlantacao() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  labelMesesContainer: {
-    width: '90%',
-    alignSelf: 'center',
-    marginBottom: RFValue(12),
-  },
-  labelMeses: {
-    fontSize: RFValue(16),
-    fontWeight: 'bold',
-    marginBottom: RFValue(6),
-  },
-  inputIconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: RFValue(10),
-    backgroundColor: '#fff',
-    height: RFValue(40),
-    justifyContent: 'space-between',
-  },
-  inputMeses: {
-    flex: 1,
-    fontSize: RFValue(14),
-    color: '#000',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    marginHorizontal: 30,
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: '70%',
-  },
-  modalTitle: {
-    fontSize: RFValue(18),
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  mesItem: {
-    paddingVertical: 10,
-  },
-  btnFechar: {
-    marginTop: 10,
-    backgroundColor: '#4CAF50',
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 6,
-  },
-  btnLimpar: {
-    marginTop: 10,
-    paddingVertical: 8,
-    alignItems: 'center',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#cc0000',
-  },
-  inputMeses: {
-  fontSize: RFValue(14),
-  color: '#000',
-  paddingRight: RFValue(10),
-  paddingVertical: 0,
-  width:'90%'
-},
-
-});
