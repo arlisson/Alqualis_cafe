@@ -1,0 +1,84 @@
+
+      PRAGMA foreign_keys = ON;
+
+-- -----------------------------------------------------
+-- Inserir 5 produtores
+-- -----------------------------------------------------
+INSERT INTO produtor (nome_produtor, cpf_produtor, codigo_produtor) VALUES
+  ('João Silva',    '12345678901', 'PRD001'),
+  ('Maria Santos',  '23456789012', 'PRD002'),
+  ('Carlos Oliveira','34567890123', 'PRD003'),
+  ('Ana Pereira',   '45678901234', 'PRD004'),
+  ('Paulo Souza',   '56789012345', 'PRD005');
+
+-- -----------------------------------------------------
+-- Inserir 5 comunidades
+-- -----------------------------------------------------
+INSERT INTO comunidade (id_comunidade, nome_comunidade) VALUES
+  (1, 'Comunidade A'),
+  (2, 'Comunidade B'),
+  (3, 'Comunidade C'),
+  (4, 'Comunidade D'),
+  (5, 'Comunidade E');
+
+-- -----------------------------------------------------
+-- Inserir 5 municípios
+-- -----------------------------------------------------
+INSERT INTO municipio (id_municipio, nome_municipio) VALUES
+  (1, 'Município X'),
+  (2, 'Município Y'),
+  (3, 'Município Z'),
+  (4, 'Município W'),
+  (5, 'Município V');
+
+-- -----------------------------------------------------
+-- Inserir 5 cooperativas
+-- -----------------------------------------------------
+INSERT INTO cooperativa (nome_cooperativa) VALUES
+  ('Cooperativa Alpha'),
+  ('Cooperativa Beta'),
+  ('Cooperativa Gama'),
+  ('Cooperativa Delta'),
+  ('Cooperativa Epsilon');
+
+-- -----------------------------------------------------
+-- Inserir 5 variedades
+-- -----------------------------------------------------
+INSERT INTO variedade (nome_variedade) VALUES
+  ('BRS Capiaçu'),
+  ('Catuaí Vermelho'),
+  ('Mundo Novo'),
+  ('Acaiá'),
+  ('Icatu');
+
+-- -----------------------------------------------------
+-- Inserir 5 faces de exposição
+-- -----------------------------------------------------
+INSERT INTO face_exposicao (nome_face_exposicao) VALUES
+  ('Norte'),
+  ('Sul'),
+  ('Leste'),
+  ('Oeste'),
+  ('Nordeste');
+
+-- -----------------------------------------------------
+-- Exemplo: Inserir 5 plantações de teste
+-- -----------------------------------------------------
+INSERT INTO plantacao (
+  id_produtor,
+  id_variedade,
+  id_comunidade,
+  id_municipio,
+  nome_plantacao,
+  latitude,
+  longitude,
+  altitude_media,
+  nome_talhao,
+  id_face_exposicao
+) VALUES
+  (1, 1, 1, 1, 'Plantação João A',  -23.550520, -46.633308, '900', 'Talhão 1', 1),
+  (2, 2, 2, 2, 'Plantação Maria B',  -22.903539, -43.209587, '800', 'Talhão 2', 2),
+  (3, 3, 3, 3, 'Plantação Carlos C', -15.794229, -47.882166, '1000','Talhão 3', 3),
+  (4, 4, 4, 4, 'Plantação Ana D',     -19.919130, -43.938607, '850', 'Talhão 4', 4),
+  (5, 5, 5, 5, 'Plantação Paulo E',   -8.047562,  -34.877,    '50',  'Talhão 5', 5);
+

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View, Text, StyleSheet,
   TouchableOpacity
@@ -10,43 +10,77 @@ import ViewCenter from '../../components/personalizados/ViewCenter'
 import Label from '../../components/personalizados/Label';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
+import { buscarRegistrosGenericos,
+  inserirProdutor
+ } from '../../database/database';
+
 export default function CadastrarProdutor() {
 
   const [nomeProdutor,setNomeProdutor] = useState('');
   const [cpfProdutor,setCpfProdutor] = useState('');
   const [codigoProdutor,setCodigoProdutor] = useState('');
   const [cooperativa, setCooperativa] = useState('');
+   // Estado para armazenar as opções vindas do banco
+  const [cooperativasOptions, setCooperativasOptions] = useState([]);
 
+  // Carrega as cooperativas ao montar o componente
+  useEffect(() => {
+    (async () => {
+      try {
+        const rows = await buscarRegistrosGenericos('cooperativa');
+        // rows: [{ id_cooperativa, nome_cooperativa }, ...]
+        const opts = rows.map(r => ({
+          label: r.nome_cooperativa,
+          value: r.id_cooperativa.toString(),  // sempre string para o dropdown
+        }));
+        setCooperativasOptions(opts);
+      } catch (error) {
+        console.error('Erro ao carregar cooperativas:', error);
+      }
+    })();
+  }, []);
 
-  const handleSalvar =()=>{
+  const handleSalvar = async () => {
     console.log(`Nome Produtor: ${nomeProdutor}\n
       Cpf Produtor: ${cpfProdutor}\n
       Codigo Produtor: ${codigoProdutor}\n
       Cooperativa: ${cooperativa.label} - ${cooperativa.value}`)
+    if (!nomeProdutor.trim()) {
+      Alert.alert('Erro', 'Nome do produtor é obrigatório.');
+      return;
+    }
+    try {
+      const payload = {
+        nome_produtor: nomeProdutor,
+        cpf_prdutor: cpfProdutor || null,
+        codigo_produtor: codigoProdutor || null,
+        id_cooperativa: cooperativa ? parseInt(cooperativa.value, 10) : null
+      };
+      const newId = await inserirProdutor(payload);
+      if (newId) {
+        console.log(`Produtor cadastrado com ID: ${newId}`);
+        // limpa campos
+        setNomeProdutor('');
+        setCpfProdutor('');
+        setCodigoProdutor('');
+        setCooperativa(null);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao cadastrar produtor:', error);
+    }
   };
 
-  const data = [
-    { label: 'Cooperativa 1', value: '1' },
-    { label: 'Cooperativa 2', value: '2' },
-    { label: 'Cooperativa 3', value: '3' },
-    { label: 'Cooperativa 4', value: '4' },
-    { label: 'Cooperativa 5', value: '5' },
-    { label: 'Cooperativa 6', value: '6' },
-    { label: 'Cooperativa 7', value: '7' },
-    { label: 'Cooperativa 8', value: '8' },
-  ];
-  
   return (
     <View style={{flex: 1, backgroundColor:Cores.verde }}>
       <HeaderTitle texto='Cadastrar Produtor' voltar='true' home='true' />
       <ViewCenter>
         <Label label='Nome' input='true' onChangeText={setNomeProdutor} value = {nomeProdutor}/>
-        <Label label='CPF' input='true' onChangeText={setCpfProdutor} value={cpfProdutor}/>
+        <Label label='CPF' input='true' onChangeText={setCpfProdutor} value={cpfProdutor} mask={'cpf'}/>
         <Label label='Código' input='true' onChangeText={setCodigoProdutor} value = {codigoProdutor}/>
         <Label
           label='Cooperativa/Associação'
           dropdown={true}
-          data={data} 
+          data={cooperativasOptions} 
           value={cooperativa}         
           onChangeText={setCooperativa}
           

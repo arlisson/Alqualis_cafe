@@ -15,11 +15,23 @@ import DropdownComponent from './DropDownComponent';
 import stylesGeral from '../../assets/styles/stylesGeral';
 
 /**
- * Componente reutilizável de campo com label:
- * - input comum
- * - dropdown
- * - input somente leitura com seleção múltipla interna via modal
+ * Máscara genérica CPF: 000.000.000-00
  */
+const formatCPF = (value = '') => {
+  // remove tudo que não for dígito
+  const digits = value.replace(/\D+/g, '');
+  // aplica máscara
+  const part1 = digits.substring(0, 3);
+  const part2 = digits.length > 3 ? digits.substring(3, 6) : '';
+  const part3 = digits.length > 6 ? digits.substring(6, 9) : '';
+  const part4 = digits.length > 9 ? digits.substring(9, 11) : '';
+  let formatted = part1;
+  if (part2) formatted += `.${part2}`;
+  if (part3) formatted += `.${part3}`;
+  if (part4) formatted += `-${part4}`;
+  return formatted;
+};
+
 export default function Label({
   label = 'Label',
   input = false,
@@ -37,15 +49,16 @@ export default function Label({
   modalVisible: externalModalVisible = null,
   setModalVisible: externalSetModalVisible = null,
   renderModalContent = null,
-  options = [], // para uso interno do selectableInput
+  options = [],
+  // NOVO: tipo de máscara
+  mask = null, // ex: 'cpf'
 }) {
   const [internalModalVisible, setInternalModalVisible] = useState(false);
- 
+
   const isExternal = Array.isArray(value) && typeof onChangeText === 'function';
   const [internalSelectedItems, setInternalSelectedItems] = useState([]);
   const selectedItems = isExternal ? value : internalSelectedItems;
   const setSelectedItems = isExternal ? onChangeText : setInternalSelectedItems;
-
 
   const modalVisible = externalModalVisible ?? internalModalVisible;
   const setModalVisible = externalSetModalVisible ?? setInternalModalVisible;
@@ -73,13 +86,21 @@ export default function Label({
         )}
       />
       <TouchableOpacity onPress={handleClearAll} style={styles.btnLimpar}>
-        <Text style={{ color: '#fff'}}>Limpar Todos</Text>
+        <Text style={{ color: '#fff' }}>Limpar Todos</Text>
       </TouchableOpacity>
     </>
   );
 
   const displayValue = Array.isArray(selectedItems) ? selectedItems.join(', ') : '';
 
+  // Wrapper para onChangeText com máscara
+  const handleTextChange = (text) => {
+    let formatted = text;
+    if (mask === 'cpf') {
+      formatted = formatCPF(text);
+    }
+    onChangeText(formatted);
+  };
 
   if (horizontal) {
     return (
@@ -90,7 +111,8 @@ export default function Label({
             style={styles.input}
             placeholder={label}
             value={value}
-            onChangeText={onChangeText}
+            onChangeText={handleTextChange}
+            keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
           />
           {icon && (
             <Ionicons
@@ -116,7 +138,8 @@ export default function Label({
             style={styles.input}
             placeholder={label}
             value={value}
-            onChangeText={onChangeText}
+            onChangeText={handleTextChange}
+            keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
           />
           {icon && (
             <Ionicons

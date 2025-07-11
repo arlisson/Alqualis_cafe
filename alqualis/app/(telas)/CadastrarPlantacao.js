@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet,
-  TextInput, Modal, TouchableOpacity, FlatList, Alert, ScrollView
+  View, Text, Modal, TouchableOpacity, Alert
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -11,15 +10,29 @@ import Botao from '../../components/personalizados/Botao';
 import ViewCenter from '../../components/personalizados/ViewCenter';
 import Label from '../../components/personalizados/Label';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { Ionicons } from '@expo/vector-icons';
+import { buscarRegistrosGenericos } from '../../database/database';
 
 export default function CadastrarPlantacao() {
   const meses = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
-
-  const faces = ['Norte', 'Sul', 'Leste', 'Oeste', 'Noroeste', 'Nordeste', 'Sudoeste', 'Sudeste'];
+  
+  const [facesOptions, setFacesOptions] = useState([]);       // ← options dinâmicas
+ // Carrega as faces de exposição do banco na montagem
+  useEffect(() => {
+    (async () => {
+      try {
+        // retorna [{ id_face_exposicao, nome_face_exposicao }, …]
+        const rows = await buscarRegistrosGenericos('face_exposicao');
+        // mapeia só o nome pra passar ao Label
+        const nomes = rows.map(r => r.nome_face_exposicao);
+        setFacesOptions(nomes);
+      } catch (e) {
+        console.error('Erro ao carregar faces de exposição:', e);
+      }
+    })();
+  }, []);
 
   const [mapVisible, setMapVisible] = useState(false);
   const [mapRegion, setMapRegion] = useState(null);
@@ -146,7 +159,7 @@ export default function CadastrarPlantacao() {
         <Label
           label="Face de Exposição"
           selectableInput
-          options={faces}
+          options={facesOptions}
           mainIconName="compass-outline"
           value={facesSelecionadas}
           onChangeText={(valArray) => setFacesSelecionadas(valArray)} // agora o componente atualiza seu estado real

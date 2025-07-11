@@ -12,9 +12,9 @@ import Cores from '../../constants/Cores';
  * @param {boolean} icone - Se deve mostrar o ícone
  * @param {string} foto - Nome do ícone Ionicons
  */
-export default function Botao({ onPress, texto = 'Novo Botão', icone = true, foto = 'add-circle-outline' }) {
+export default function Botao({ onPress, texto = 'Novo Botão', icone = true, foto = 'add-circle-outline', cor=Cores.marrom }) {
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, {backgroundColor:cor}]} onPress={onPress}>
       <View style={styles.innerContent}>
         {icone && (
           <Ionicons name={foto} size={RFValue(20)} color="#fff" style={styles.icon} />
