@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import * as FileSystem from "expo-file-system";
 
 let db = null;
-const DB_NAME = "alqualis.db";
+const DB_NAME = "alqualis";
 
 /**
  * Abre (ou retorna) a conexão SQLite
@@ -50,10 +50,10 @@ export const createDatabase = async (mensagem = true) => {
       -- Tabela produtor
       -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS produtor (
-        id_produtor        INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_produtor      TEXT    NOT NULL,
-        cpf_produtor        TEXT    UNIQUE DEFAULT 'Não informado',
-        codigo_produtor    TEXT    UNIQUE
+        id_produtor     INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_produtor   TEXT    NOT NULL,
+        cpf_produtor    TEXT    UNIQUE,          -- retirado o DEFAULT
+        codigo_produtor TEXT    UNIQUE
       );
 
       -- -----------------------------------------------------
@@ -129,7 +129,7 @@ export const createDatabase = async (mensagem = true) => {
       -- Tabela cooperativa_produtor
       -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS cooperativa_produtor (
-        id_cooperativa_produtor INTEGER PRIMARY KEY,
+        id_cooperativa_produtor INTEGER PRIMARY KEY AUTOINCREMENT,
         id_cooperativa          INTEGER NOT NULL,
         id_produtor             INTEGER NOT NULL,
         FOREIGN KEY (id_cooperativa) REFERENCES cooperativa(id_cooperativa),
@@ -139,6 +139,7 @@ export const createDatabase = async (mensagem = true) => {
       -- Índices adicionais
       CREATE INDEX IF NOT EXISTS idx_cp_cooperativa ON cooperativa_produtor(id_cooperativa);
       CREATE INDEX IF NOT EXISTS idx_cp_produtor    ON cooperativa_produtor(id_produtor);
+      
 
     `);
 
@@ -160,7 +161,7 @@ export const createDatabase = async (mensagem = true) => {
  */
 export const inserirProdutor = async ({
   nome_produtor,
-  cpf_produtor = "Não informado",
+  cpf_produtor = "",
   codigo_produtor = null,
   id_cooperativa = null,
 }) => {
@@ -274,3 +275,31 @@ export const inserirGenerico = async (table, data, successMessage) => {
     return null;
   }
 };
+
+/**
+ * Busca todos os produtores com todos os seus campos,
+ * e adiciona também o nome da cooperativa (ou null).
+ *
+ * @returns {Promise<Array<Object>>} Cada objeto terá todas as colunas de `produtor`
+ * e ainda uma propriedade `cooperativa`.
+ */
+export async function buscarProdutoresCooperativa() {
+  const db = await openDatabase();
+  const sql = `
+    SELECT
+      p.*,
+      c.nome_cooperativa AS cooperativa
+    FROM produtor p
+    LEFT JOIN cooperativa_produtor cp
+      ON cp.id_produtor = p.id_produtor
+    LEFT JOIN cooperativa c
+      ON c.id_cooperativa = cp.id_cooperativa;
+  `;
+  try {
+    const rows = await db.getAllAsync(sql);
+    return rows;
+  } catch (error) {
+    console.error('❌ Erro ao buscar produtores com cooperativa:', error);
+    throw error;
+  }
+}

@@ -11,6 +11,14 @@ INSERT INTO produtor (nome_produtor, cpf_produtor, codigo_produtor) VALUES
   ('Ana Pereira',   '45678901234', 'PRD004'),
   ('Paulo Souza',   '56789012345', 'PRD005');
 
+-- 1 Insere 5 cooperativas
+INSERT INTO cooperativa (nome_cooperativa) VALUES
+  ('Cooperativa A'),
+  ('Cooperativa B'),
+  ('Cooperativa C'),
+  ('Cooperativa D'),
+  ('Cooperativa E');
+
 -- -----------------------------------------------------
 -- Inserir 5 comunidades
 -- -----------------------------------------------------
@@ -30,16 +38,6 @@ INSERT INTO municipio (id_municipio, nome_municipio) VALUES
   (3, 'Município Z'),
   (4, 'Município W'),
   (5, 'Município V');
-
--- -----------------------------------------------------
--- Inserir 5 cooperativas
--- -----------------------------------------------------
-INSERT INTO cooperativa (nome_cooperativa) VALUES
-  ('Cooperativa Alpha'),
-  ('Cooperativa Beta'),
-  ('Cooperativa Gama'),
-  ('Cooperativa Delta'),
-  ('Cooperativa Epsilon');
 
 -- -----------------------------------------------------
 -- Inserir 5 variedades
@@ -82,3 +80,10 @@ INSERT INTO plantacao (
   (4, 4, 4, 4, 'Plantação Ana D',     -19.919130, -43.938607, '850', 'Talhão 4', 4),
   (5, 5, 5, 5, 'Plantação Paulo E',   -8.047562,  -34.877,    '50',  'Talhão 5', 5);
 
+INSERT INTO cooperativa_produtor (id_cooperativa, id_produtor)
+VALUES
+  ( 1, 1),
+  ( 2, 2),
+  ( 3, 3),
+  ( 4, 4),
+  (5, 5);

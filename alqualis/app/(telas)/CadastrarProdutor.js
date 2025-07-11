@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {
   View, Text, StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert
 } from 'react-native';
 import HeaderTitle from '../../components/personalizados/headerTtitle';
 import Cores from '../../constants/Cores';
@@ -19,7 +20,7 @@ export default function CadastrarProdutor() {
   const [nomeProdutor,setNomeProdutor] = useState('');
   const [cpfProdutor,setCpfProdutor] = useState('');
   const [codigoProdutor,setCodigoProdutor] = useState('');
-  const [cooperativa, setCooperativa] = useState('');
+  const [cooperativa, setCooperativa] = useState(null);
    // Estado para armazenar as opções vindas do banco
   const [cooperativasOptions, setCooperativasOptions] = useState([]);
 
@@ -41,21 +42,28 @@ export default function CadastrarProdutor() {
   }, []);
 
   const handleSalvar = async () => {
-    console.log(`Nome Produtor: ${nomeProdutor}\n
-      Cpf Produtor: ${cpfProdutor}\n
-      Codigo Produtor: ${codigoProdutor}\n
-      Cooperativa: ${cooperativa.label} - ${cooperativa.value}`)
+    // só tenta acessar label/value se houver cooperativa
+    console.log(
+      `Nome Produtor: ${nomeProdutor}\n` +
+      `Cpf Produtor: ${cpfProdutor}\n` +
+      `Codigo Produtor: ${codigoProdutor}\n` +
+      `Cooperativa: ${cooperativa ? cooperativa.label + ' - ' + cooperativa.value : 'Nenhuma'}`
+    );
+
     if (!nomeProdutor.trim()) {
       Alert.alert('Erro', 'Nome do produtor é obrigatório.');
       return;
     }
+
     try {
       const payload = {
         nome_produtor: nomeProdutor,
-        cpf_prdutor: cpfProdutor || null,
-        codigo_produtor: codigoProdutor || null,
-        id_cooperativa: cooperativa ? parseInt(cooperativa.value, 10) : null
+        cpf_produtor: cpfProdutor?.trim() || null,
+        codigo_produtor: codigoProdutor?.trim() || null,
+        // se cooperativa for null, id_cooperativa será null
+        id_cooperativa: cooperativa ? parseInt(cooperativa.value, 10) : null,
       };
+
       const newId = await inserirProdutor(payload);
       if (newId) {
         console.log(`Produtor cadastrado com ID: ${newId}`);

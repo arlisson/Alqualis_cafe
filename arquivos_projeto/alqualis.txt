@@ -1,0 +1,96 @@
+-- Ativa verificação de chaves estrangeiras no SQLite
+      PRAGMA foreign_keys = ON;
+
+      -- -----------------------------------------------------
+      -- Tabela produtor
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS produtor (
+        id_produtor        INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_produtor      TEXT    NOT NULL,
+        cpf_produtor        TEXT    UNIQUE DEFAULT 'Não informado',
+        codigo_produtor    TEXT    UNIQUE
+      );
+
+      -- -----------------------------------------------------
+      -- Tabela comunidade
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS comunidade (
+        id_comunidade      INTEGER PRIMARY KEY,
+        nome_comunidade    TEXT    UNIQUE
+      );
+
+      -- -----------------------------------------------------
+      -- Tabela municipio
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS municipio (
+        id_municipio       INTEGER PRIMARY KEY,
+        nome_municipio     TEXT    UNIQUE
+      );
+
+      -- -----------------------------------------------------
+      -- Tabela cooperativa
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS cooperativa (
+        id_cooperativa     INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_cooperativa   TEXT    UNIQUE
+      );
+
+      -- -----------------------------------------------------
+      -- Tabela variedade
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS variedade (
+        id_variedade       INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_variedade     TEXT    UNIQUE
+      );
+
+      -- -----------------------------------------------------
+      -- Tabela face_exposicao
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS face_exposicao (
+        id_face_exposicao  INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_face_exposicao TEXT   UNIQUE
+      );
+
+      -- -----------------------------------------------------
+      -- Tabela plantacao
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS plantacao (
+        id_plantacao       INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_produtor        INTEGER NOT NULL,
+        id_variedade       INTEGER NOT NULL,
+        id_comunidade      INTEGER NOT NULL,
+        id_municipio       INTEGER NOT NULL,
+        nome_plantacao     TEXT    NOT NULL,
+        latitude           TEXT,
+        longitude          TEXT,
+        altitude_media     TEXT,
+        nome_talhao        TEXT,
+        id_face_exposicao  INTEGER,
+        FOREIGN KEY (id_produtor)       REFERENCES produtor(id_produtor),
+        FOREIGN KEY (id_variedade)      REFERENCES variedade(id_variedade),
+        FOREIGN KEY (id_comunidade)     REFERENCES comunidade(id_comunidade),
+        FOREIGN KEY (id_municipio)      REFERENCES municipio(id_municipio),
+        FOREIGN KEY (id_face_exposicao) REFERENCES face_exposicao(id_face_exposicao)
+      );
+
+      -- Índices adicionais para acelerar buscas
+      CREATE INDEX IF NOT EXISTS idx_plantacao_produtor      ON plantacao(id_produtor);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_variedade     ON plantacao(id_variedade);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_comunidade    ON plantacao(id_comunidade);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_municipio     ON plantacao(id_municipio);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_face          ON plantacao(id_face_exposicao);
+
+      -- -----------------------------------------------------
+      -- Tabela cooperativa_produtor
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS cooperativa_produtor (
+        id_cooperativa_produtor INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_cooperativa          INTEGER NOT NULL,
+        id_produtor             INTEGER NOT NULL,
+        FOREIGN KEY (id_cooperativa) REFERENCES cooperativa(id_cooperativa),
+        FOREIGN KEY (id_produtor)    REFERENCES produtor(id_produtor)
+      );
+
+      -- Índices adicionais
+      CREATE INDEX IF NOT EXISTS idx_cp_cooperativa ON cooperativa_produtor(id_cooperativa);
+      CREATE INDEX IF NOT EXISTS idx_cp_produtor    ON cooperativa_produtor(id_produtor);
