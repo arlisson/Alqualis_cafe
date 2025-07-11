@@ -22,6 +22,8 @@ export default function OutrosCadastros() {
       console.log(`Nome da ${label}: ${nome}`)
     }else if(parseInt(id)===2){
       console.log(`Nome do ${label}: ${nome}`)
+    }else if(parseInt(id)===3){
+      console.log(`Nome da ${label}: ${nome}`)
     }else{
       console.log(`Nome da ${label}: ${nome}`)
     }

@@ -72,8 +72,8 @@ export default function Label({
           </TouchableOpacity>
         )}
       />
-      <TouchableOpacity onPress={handleClearAll} style={{ marginTop: 10 }}>
-        <Text style={{ color: '#cc0000', textAlign: 'center' }}>Limpar Todos</Text>
+      <TouchableOpacity onPress={handleClearAll} style={styles.btnLimpar}>
+        <Text style={{ color: '#fff'}}>Limpar Todos</Text>
       </TouchableOpacity>
     </>
   );
@@ -274,6 +274,13 @@ const styles = StyleSheet.create({
   btnFechar: {
     marginTop: 10,
     backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  btnLimpar: {
+    marginTop: 10,
+    backgroundColor: 'red',
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 6,

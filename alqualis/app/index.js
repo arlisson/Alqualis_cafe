@@ -31,9 +31,14 @@ export default function Index() {
         <Botao texto='Visualizar Município' foto='eye-outline'/>
         <Botao texto='Cadastrar Comunidade' foto='people-outline'onPress={() => router.push({
           pathname:'(telas)/OutrosCadastros',
-          params:{label:'Comunidade',id:'3'}})}/>
+          params:{label:'Comunidade',id:'3'}})}/>       
 
         <Botao texto='Visualizar Comunidades' foto='eye-outline'/>
+
+        <Botao texto='Cadastrar Face de Exposição' foto='sunny-outline'onPress={() => router.push({
+          pathname:'(telas)/OutrosCadastros',
+          params:{label:'Face de Exposição',id:'4'}})}/>
+
       </ViewCenter>
       
     </View>

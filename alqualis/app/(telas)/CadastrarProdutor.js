@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
 import {
   View, Text, StyleSheet,
-  TextInput
+  TouchableOpacity
 } from 'react-native';
 import HeaderTitle from '../../components/personalizados/headerTtitle';
 import Cores from '../../constants/Cores';
 import Botao from '../../components/personalizados/Botao';
 import ViewCenter from '../../components/personalizados/ViewCenter'
 import Label from '../../components/personalizados/Label';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { Ionicons } from '@expo/vector-icons';
 export default function CadastrarProdutor() {
 
   const [nomeProdutor,setNomeProdutor] = useState('');
@@ -42,12 +44,24 @@ export default function CadastrarProdutor() {
         <Label label='CPF' input='true' onChangeText={setCpfProdutor} value={cpfProdutor}/>
         <Label label='Código' input='true' onChangeText={setCodigoProdutor} value = {codigoProdutor}/>
         <Label
-          label='Cooperativa'
+          label='Cooperativa/Associação'
           dropdown={true}
           data={data} 
           value={cooperativa}         
           onChangeText={setCooperativa}
+          
         />
+        <View style={styles.checkboxContainer}>
+          <TouchableOpacity onPress={() => setCooperativa(null)} style={styles.checkbox}>
+            <Ionicons
+              name={cooperativa ? 'square-outline' : 'checkbox-outline'}
+              size={RFValue(20)}
+              color="#000"
+            />
+            <Text style={styles.checkboxLabel}>Não é associado à cooperativa/associação</Text>
+          </TouchableOpacity>
+        </View>
+
                 
       </ViewCenter>
       <Botao texto='Salvar'onPress={()=>handleSalvar()}/>
@@ -56,3 +70,18 @@ export default function CadastrarProdutor() {
   );
 }
 
+const styles = StyleSheet.create({
+  checkboxContainer: {
+    width: '90%',
+    alignSelf: 'center',
+    marginVertical: 10,
+  },
+  checkbox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkboxLabel: {
+    marginLeft: 10,
+    fontSize: RFValue(14),
+  },
+});
