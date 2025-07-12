@@ -14,13 +14,8 @@ import { Ionicons } from '@expo/vector-icons';
 import DropdownComponent from './DropDownComponent';
 import stylesGeral from '../../assets/styles/stylesGeral';
 
-/**
- * Máscara genérica CPF: 000.000.000-00
- */
 const formatCPF = (value = '') => {
-  // remove tudo que não for dígito
   const digits = value.replace(/\D+/g, '');
-  // aplica máscara
   const part1 = digits.substring(0, 3);
   const part2 = digits.length > 3 ? digits.substring(3, 6) : '';
   const part3 = digits.length > 6 ? digits.substring(6, 9) : '';
@@ -50,11 +45,11 @@ export default function Label({
   setModalVisible: externalSetModalVisible = null,
   renderModalContent = null,
   options = [],
-  // NOVO: tipo de máscara
-  mask = null, // ex: 'cpf'
+  mask = null,
+  required = false,
+  showError = false, // NOVO: controle de erro pelo componente pai
 }) {
   const [internalModalVisible, setInternalModalVisible] = useState(false);
-
   const isExternal = Array.isArray(value) && typeof onChangeText === 'function';
   const [internalSelectedItems, setInternalSelectedItems] = useState([]);
   const selectedItems = isExternal ? value : internalSelectedItems;
@@ -62,6 +57,9 @@ export default function Label({
 
   const modalVisible = externalModalVisible ?? internalModalVisible;
   const setModalVisible = externalSetModalVisible ?? setInternalModalVisible;
+
+  const isEmpty = typeof value === 'string' && value.trim() === '';
+  const showValidationError = showError && required && isEmpty;
 
   const handleToggleItem = (item) => {
     setSelectedItems((prev) =>
@@ -93,7 +91,6 @@ export default function Label({
 
   const displayValue = Array.isArray(selectedItems) ? selectedItems.join(', ') : '';
 
-  // Wrapper para onChangeText com máscara
   const handleTextChange = (text) => {
     let formatted = text;
     if (mask === 'cpf') {
@@ -105,7 +102,10 @@ export default function Label({
   if (horizontal) {
     return (
       <View style={styles.horizontalRow}>
-        <Text style={styles.labelHorizontal}>{label}</Text>
+        <Text style={styles.labelHorizontal}>
+          {label}
+          {required && <Text style={{ color: 'red' }}> *</Text>}
+        </Text>
         <View style={styles.inputHorizontalContainer}>
           <TextInput
             style={styles.input}
@@ -124,47 +124,64 @@ export default function Label({
             />
           )}
         </View>
+        {showValidationError && (
+          <Text style={styles.errorText}>Campo obrigatório</Text>
+        )}
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>
+        {label}
+        {required && <Text style={{ color: 'red' }}> *</Text>}
+      </Text>
 
       {input && (
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={label}
-            value={value}
-            onChangeText={handleTextChange}
-            keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
-          />
-          {icon && (
-            <Ionicons
-              name={icon}
-              size={RFValue(20)}
-              color="#000"
-              style={styles.icon}
-              onPress={onIconPress}
+        <>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder={label}
+              value={value}
+              onChangeText={handleTextChange}
+              keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
             />
+            {icon && (
+              <Ionicons
+                name={icon}
+                size={RFValue(20)}
+                color="#000"
+                style={styles.icon}
+                onPress={onIconPress}
+              />
+            )}
+          </View>
+          {showValidationError && (
+            <Text style={styles.errorText}>Campo obrigatório</Text>
+          )}
+        </>
+      )}
+
+      {dropdown && (
+        <View>
+          <View style={stylesGeral.dropdownRow}>
+            <View style={stylesGeral.dropdownWrapper}>
+              <DropdownComponent
+                label={label}
+                data={data}
+                value={value}
+                onChange={onChangeText}
+              />
+            </View>
+          </View>
+          {showValidationError && (
+            <Text style={styles.errorText}>Campo obrigatório</Text>
           )}
         </View>
       )}
 
-      {dropdown && (
-        <View style={stylesGeral.dropdownRow}>
-          <View style={stylesGeral.dropdownWrapper}>
-            <DropdownComponent
-              label={label}
-              data={data}
-              value={value}
-              onChange={onChangeText}
-            />
-          </View>
-        </View>
-      )}
 
       {selectableInput && (
         <>
@@ -195,7 +212,6 @@ export default function Label({
                 </TouchableOpacity>
               )
             )}
-
           </View>
 
           <Modal visible={modalVisible} animationType="slide" transparent>
@@ -307,5 +323,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 6,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: RFValue(12),
+    marginTop: RFValue(4),
+    marginLeft: RFValue(4),
   },
 });

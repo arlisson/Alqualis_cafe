@@ -1,129 +1,132 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View, Text, StyleSheet,
-  TouchableOpacity,
-  Alert
-} from 'react-native';
+// CadastrarProdutor.js
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import HeaderTitle from '../../components/personalizados/headerTtitle';
 import Cores from '../../constants/Cores';
 import Botao from '../../components/personalizados/Botao';
-import ViewCenter from '../../components/personalizados/ViewCenter'
+import ViewCenter from '../../components/personalizados/ViewCenter';
 import Label from '../../components/personalizados/Label';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
-import { buscarRegistrosGenericos,
-  inserirProdutor
- } from '../../database/database';
+import { buscarRegistrosGenericos, inserirProdutor } from '../../database/database';
 
 export default function CadastrarProdutor() {
+  const [nome, setNome] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [codigo, setCodigo] = useState('');
+  const [coop, setCoop] = useState(null);
 
-  const [nomeProdutor,setNomeProdutor] = useState('');
-  const [cpfProdutor,setCpfProdutor] = useState('');
-  const [codigoProdutor,setCodigoProdutor] = useState('');
-  const [cooperativa, setCooperativa] = useState(null);
-   // Estado para armazenar as opções vindas do banco
-  const [cooperativasOptions, setCooperativasOptions] = useState([]);
+  const [prodList, setProdList] = useState([]);
+  const [coopOptions, setCoopOptions] = useState([]);
+  const [lastCode, setLastCode] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
-  // Carrega as cooperativas ao montar o componente
   useEffect(() => {
     (async () => {
-      try {
-        const rows = await buscarRegistrosGenericos('cooperativa');
-        // rows: [{ id_cooperativa, nome_cooperativa }, ...]
-        const opts = rows.map(r => ({
-          label: r.nome_cooperativa,
-          value: r.id_cooperativa.toString(),  // sempre string para o dropdown
-        }));
-        setCooperativasOptions(opts);
-      } catch (error) {
-        console.error('Erro ao carregar cooperativas:', error);
+      const prods = await buscarRegistrosGenericos('produtor');
+      setProdList(prods);
+      if (prods.length) {
+        const last = prods.reduce((a, b) => (a.id_produtor > b.id_produtor ? a : b));
+        setLastCode(last.codigo_produtor || '');
       }
+      const coops = await buscarRegistrosGenericos('cooperativa');
+      setCoopOptions(coops.map(r => ({ label: r.nome_cooperativa, value: r.id_cooperativa.toString() })));
     })();
   }, []);
 
   const handleSalvar = async () => {
-    // só tenta acessar label/value se houver cooperativa
-    console.log(
-      `Nome Produtor: ${nomeProdutor}\n` +
-      `Cpf Produtor: ${cpfProdutor}\n` +
-      `Codigo Produtor: ${codigoProdutor}\n` +
-      `Cooperativa: ${cooperativa ? cooperativa.label + ' - ' + cooperativa.value : 'Nenhuma'}`
-    );
+  setFormSubmitted(true); // ativa exibição de erros nos Labels
 
-    if (!nomeProdutor.trim()) {
-      Alert.alert('Erro', 'Nome do produtor é obrigatório.');
-      return;
-    }
+  const nomeValido = nome.trim() !== '';
+  const codigoValido = codigo.trim() !== '';
 
-    try {
-      const payload = {
-        nome_produtor: nomeProdutor,
-        cpf_produtor: cpfProdutor?.trim() || null,
-        codigo_produtor: codigoProdutor?.trim() || null,
-        // se cooperativa for null, id_cooperativa será null
-        id_cooperativa: cooperativa ? parseInt(cooperativa.value, 10) : null,
-      };
+  if (!nomeValido || !codigoValido) {
+    Alert.alert('Erro', 'Preencha todos os campos obrigatórios');
+    return;
+  }
 
-      const newId = await inserirProdutor(payload);
-      if (newId) {
-        console.log(`Produtor cadastrado com ID: ${newId}`);
-        // limpa campos
-        setNomeProdutor('');
-        setCpfProdutor('');
-        setCodigoProdutor('');
-        setCooperativa(null);
-      }
-    } catch (error) {
-      console.error('❌ Erro ao cadastrar produtor:', error);
-    }
-  };
+  try {
+    const payload = {
+      nome_produtor: nome.trim(),
+      cpf_produtor: cpf.trim() || null,
+      codigo_produtor: codigo.trim(),
+      id_cooperativa: coop ? parseInt(coop.value, 10) : null,
+    };
+    const id = await inserirProdutor(payload);
+    if (id) Alert.alert('Sucesso', 'Produtor cadastrado!');
+  } catch {
+    Alert.alert('Erro', 'Não foi possível cadastrar');
+  }
+};
+
 
   return (
-    <View style={{flex: 1, backgroundColor:Cores.verde }}>
+    <View style={{ flex: 1, backgroundColor: Cores.verde }}>
       <HeaderTitle texto='Cadastrar Produtor' voltar='true' home='true' />
       <ViewCenter>
-        <Label label='Nome' input='true' onChangeText={setNomeProdutor} value = {nomeProdutor}/>
-        <Label label='CPF' input='true' onChangeText={setCpfProdutor} value={cpfProdutor} mask={'cpf'}/>
-        <Label label='Código' input='true' onChangeText={setCodigoProdutor} value = {codigoProdutor}/>
+        <Label
+          label='Nome'
+          input
+          value={nome}
+          onChangeText={setNome}
+          required
+          showError={formSubmitted}
+        />
+        <Label
+          label='CPF'
+          input
+          value={cpf}
+          onChangeText={setCpf}
+          mask='cpf'
+          showError={formSubmitted}
+          existingValues={prodList
+            .map(p => typeof p.cpf_produtor === 'string' ? p.cpf_produtor.replace(/\D/g, '') : '')
+            .filter(Boolean)}
+
+        />
+        <Label
+          label='Código'
+          input
+          value={codigo}
+          onChangeText={setCodigo}
+          required
+          showError={formSubmitted}
+          existingValues={prodList.map(p => p.codigo_produtor)}
+        />
+        <Text style={styles.lastCode}>
+          Último código: {lastCode || 'Nenhum'}
+        </Text>
         <Label
           label='Cooperativa/Associação'
-          dropdown={true}
-          data={cooperativasOptions} 
-          value={cooperativa}         
-          onChangeText={setCooperativa}
-          
+          dropdown
+          value={coop}
+          onChangeText={setCoop}
+          dropdownData={coopOptions}
         />
-        <View style={styles.checkboxContainer}>
-          <TouchableOpacity onPress={() => setCooperativa(null)} style={styles.checkbox}>
-            <Ionicons
-              name={cooperativa ? 'square-outline' : 'checkbox-outline'}
-              size={RFValue(20)}
-              color="#000"
-            />
-            <Text style={styles.checkboxLabel}>Não é associado à cooperativa/associação</Text>
-          </TouchableOpacity>
-        </View>
-
-                
+        <TouchableOpacity style={styles.checkbox} onPress={() => setCoop(null)}>
+          <Ionicons name={coop ? 'square-outline' : 'checkbox-outline'} size={RFValue(20)} />
+          <Text style={styles.checkboxLabel}>Não é associado</Text>
+        </TouchableOpacity>
       </ViewCenter>
-      <Botao texto='Salvar'onPress={()=>handleSalvar()}/>
-      
+      <Botao texto='Salvar' onPress={handleSalvar} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  checkboxContainer: {
-    width: '90%',
-    alignSelf: 'center',
-    marginVertical: 10,
+  lastCode: {
+    marginLeft: '5%',
+    marginVertical: RFValue(8),
+    fontSize: RFValue(12),
+    color: '#333',
   },
   checkbox: {
     flexDirection: 'row',
     alignItems: 'center',
+    padding: RFValue(10),
   },
   checkboxLabel: {
-    marginLeft: 10,
+    marginLeft: RFValue(8),
     fontSize: RFValue(14),
   },
 });

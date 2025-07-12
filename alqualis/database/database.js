@@ -43,17 +43,16 @@ export const createDatabase = async (mensagem = true) => {
 
   try {
     await database.execAsync(`
-      -- Ativa verificação de chaves estrangeiras no SQLite
       PRAGMA foreign_keys = ON;
 
       -- -----------------------------------------------------
       -- Tabela produtor
       -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS produtor (
-        id_produtor     INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_produtor   TEXT    NOT NULL,
-        cpf_produtor    TEXT    UNIQUE,          -- retirado o DEFAULT
-        codigo_produtor TEXT    UNIQUE
+        id_produtor        INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_produtor      TEXT    NOT NULL,
+        cpf_produtor       TEXT    UNIQUE,
+        codigo_produtor    TEXT    UNIQUE
       );
 
       -- -----------------------------------------------------
@@ -89,14 +88,6 @@ export const createDatabase = async (mensagem = true) => {
       );
 
       -- -----------------------------------------------------
-      -- Tabela face_exposicao
-      -- -----------------------------------------------------
-      CREATE TABLE IF NOT EXISTS face_exposicao (
-        id_face_exposicao  INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_face_exposicao TEXT   UNIQUE
-      );
-
-      -- -----------------------------------------------------
       -- Tabela plantacao
       -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS plantacao (
@@ -110,20 +101,18 @@ export const createDatabase = async (mensagem = true) => {
         longitude          TEXT,
         altitude_media     TEXT,
         nome_talhao        TEXT,
-        id_face_exposicao  INTEGER,
+        -- removemos o campo 'face_exposicao' aqui porque agora teremos tabela de junção
         FOREIGN KEY (id_produtor)       REFERENCES produtor(id_produtor),
         FOREIGN KEY (id_variedade)      REFERENCES variedade(id_variedade),
         FOREIGN KEY (id_comunidade)     REFERENCES comunidade(id_comunidade),
-        FOREIGN KEY (id_municipio)      REFERENCES municipio(id_municipio),
-        FOREIGN KEY (id_face_exposicao) REFERENCES face_exposicao(id_face_exposicao)
+        FOREIGN KEY (id_municipio)      REFERENCES municipio(id_municipio)
       );
 
       -- Índices adicionais para acelerar buscas
-      CREATE INDEX IF NOT EXISTS idx_plantacao_produtor      ON plantacao(id_produtor);
-      CREATE INDEX IF NOT EXISTS idx_plantacao_variedade     ON plantacao(id_variedade);
-      CREATE INDEX IF NOT EXISTS idx_plantacao_comunidade    ON plantacao(id_comunidade);
-      CREATE INDEX IF NOT EXISTS idx_plantacao_municipio     ON plantacao(id_municipio);
-      CREATE INDEX IF NOT EXISTS idx_plantacao_face          ON plantacao(id_face_exposicao);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_produtor   ON plantacao(id_produtor);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_variedade  ON plantacao(id_variedade);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_comunidade ON plantacao(id_comunidade);
+      CREATE INDEX IF NOT EXISTS idx_plantacao_municipio  ON plantacao(id_municipio);
 
       -- -----------------------------------------------------
       -- Tabela cooperativa_produtor
@@ -136,28 +125,56 @@ export const createDatabase = async (mensagem = true) => {
         FOREIGN KEY (id_produtor)    REFERENCES produtor(id_produtor)
       );
 
-      -- Índices adicionais
       CREATE INDEX IF NOT EXISTS idx_cp_cooperativa ON cooperativa_produtor(id_cooperativa);
-      CREATE INDEX IF NOT EXISTS idx_cp_produtor    ON cooperativa_produtor(id_produtor);
+      CREATE INDEX IF NOT EXISTS idx_cp_produtor     ON cooperativa_produtor(id_produtor);
+
+      -- -----------------------------------------------------
+      -- Tabela face_exposicao
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS face_exposicao (
+        id_face_exposicao   INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_face_exposicao TEXT    UNIQUE
+      );
+
+      -- -----------------------------------------------------
+      -- Tabela de junção plantacao ↔ face_exposicao
+      -- -----------------------------------------------------
+      CREATE TABLE IF NOT EXISTS face_exposicao_plantacao (
+        id_face_exposicao_plantacao INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_face_exposicao           INTEGER,
+        id_plantacao                INTEGER,
+        FOREIGN KEY (id_face_exposicao) REFERENCES face_exposicao(id_face_exposicao),
+        FOREIGN KEY (id_plantacao)      REFERENCES plantacao(id_plantacao)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_fep_face       ON face_exposicao_plantacao(id_face_exposicao);
+      CREATE INDEX IF NOT EXISTS idx_fep_plantacao  ON face_exposicao_plantacao(id_plantacao);
+
+      
       
 
     `);
 
     if (mensagem) {
       Alert.alert("Sucesso", "Banco de dados criado com sucesso!");
-    }
+    }    
     return database;
+  
   } catch (error) {
     console.error("❌ Erro ao criar banco de dados:", error);
     if (mensagem) {
       Alert.alert("Erro", "Erro ao criar o banco de dados.");
     }
     throw error;
-  }
+  } 
 };
 
 /**
  * @description Insere um produtor e opcionalmente associa a cooperativa
+ * @param {*} nome_produtor
+ * @param {*} cpf_produtor
+ * @param {*} codigo_produtor
+ * @param {*} id_cooperativa
  */
 export const inserirProdutor = async ({
   nome_produtor,
@@ -199,7 +216,10 @@ export const inserirProdutor = async ({
 };
 
 /**
- * Associa produtor ↔ cooperativa
+ * @description Associa produtor ↔ cooperativa
+ * @param {*} id_produtor
+ * @param {*} id_cooperativa
+ * @returns {boolean} true or false
  */
 export const associarProdutorCooperativa = async ({
   id_produtor,
@@ -227,7 +247,8 @@ export const associarProdutorCooperativa = async ({
 };
 
 /**
- * Busca todos os registros de uma tabela
+ * @description Busca todos os registros de uma tabela
+ * @param {*} nomeTabela
  */
 export const buscarRegistrosGenericos = async (nomeTabela) => {
   const database = openDatabase();
@@ -277,7 +298,7 @@ export const inserirGenerico = async (table, data, successMessage) => {
 };
 
 /**
- * Busca todos os produtores com todos os seus campos,
+ * @description Busca todos os produtores com todos os seus campos, 
  * e adiciona também o nome da cooperativa (ou null).
  *
  * @returns {Promise<Array<Object>>} Cada objeto terá todas as colunas de `produtor`
@@ -303,3 +324,151 @@ export async function buscarProdutoresCooperativa() {
     throw error;
   }
 }
+
+/**
+ * @description Busca todas as plantações, substituindo
+ * - id_produtor   → nome_produtor
+ * - id_variedade  → nome_variedade
+ * - id_comunidade → nome_comunidade
+ * - id_municipio  → nome_municipio
+ * E agrupando todas as faces de exposição numa coluna `faces_exposicao`
+ *
+ * @returns {Promise<Array<Object>>} 
+ *   Cada objeto terá:
+ *     id_plantacao,
+ *     nome_plantacao,
+ *     produtor,
+ *     variedade,
+ *     comunidade,
+ *     municipio,
+ *     latitude,
+ *     longitude,
+ *     altitude_media,
+ *     nome_talhao,
+ *     faces_exposicao  // ex: "Norte, Sul, Leste"
+ */
+export async function buscarPlantacoesDetalhadas() {
+  const db = openDatabase();
+  const sql = `
+    SELECT
+      p.id_plantacao,
+      p.nome_plantacao,
+      pr.nome_produtor    AS produtor,
+      v.nome_variedade    AS variedade,
+      co.nome_comunidade  AS comunidade,
+      mu.nome_municipio   AS municipio,
+      p.latitude,
+      p.longitude,
+      p.altitude_media,
+      p.nome_talhao,
+      -- concatena todas as faces, separadas por vírgula e espaço
+      GROUP_CONCAT(fe.nome_face_exposicao, ', ') AS faces_exposicao
+    FROM plantacao p
+    LEFT JOIN produtor pr
+      ON pr.id_produtor = p.id_produtor
+    LEFT JOIN variedade v
+      ON v.id_variedade = p.id_variedade
+    LEFT JOIN comunidade co
+      ON co.id_comunidade = p.id_comunidade
+    LEFT JOIN municipio mu
+      ON mu.id_municipio = p.id_municipio
+    -- junta via tabela de relação N:N
+    LEFT JOIN face_exposicao_plantacao fep
+      ON fep.id_plantacao = p.id_plantacao
+    LEFT JOIN face_exposicao fe
+      ON fe.id_face_exposicao = fep.id_face_exposicao
+    GROUP BY p.id_plantacao
+    ORDER BY p.id_plantacao;
+  `;
+  try {
+    const rows = await db.getAllAsync(sql);
+    return rows;
+  } catch (error) {
+    console.error('❌ Erro ao buscar plantações detalhadas:', error);
+    throw error;
+  }
+}
+
+/**
+ * Insere uma plantação e associa múltiplas faces de exposição a ela.
+ *
+ * @param {Object} plantacao
+ * @param {number} plantacao.id_produtor
+ * @param {number} plantacao.id_variedade
+ * @param {number} plantacao.id_comunidade
+ * @param {number} plantacao.id_municipio
+ * @param {string} plantacao.nome_plantacao
+ * @param {string} [plantacao.latitude]
+ * @param {string} [plantacao.longitude]
+ * @param {string} [plantacao.altitude_media]
+ * @param {string} [plantacao.nome_talhao]
+ * @param {number[]} plantacao.faces Array de IDs de face_exposicao
+ * @returns {Promise<number|null>} id da plantação ou null em caso de erro
+ */
+export const inserirPlantacao = async ({
+  id_produtor,
+  id_variedade,
+  id_comunidade,
+  id_municipio,
+  nome_plantacao,
+  latitude = null,
+  longitude = null,
+  altitude_media = null,
+  nome_talhao = null,
+  faces = [],
+}) => {
+  const db = openDatabase();
+
+  // validação mínima
+  if (!id_produtor || !id_variedade || !id_comunidade || !id_municipio || !nome_plantacao) {
+    Alert.alert('Erro', 'Campos obrigatórios não informados.');
+    return null;
+  }
+
+  try {
+    // inicia transação
+    await db.execAsync('BEGIN TRANSACTION;');
+
+    // 1) insere na plantacao
+    const res = await db.runAsync(
+      `INSERT INTO plantacao (
+        id_produtor, id_variedade, id_comunidade, id_municipio,
+        nome_plantacao, latitude, longitude, altitude_media, nome_talhao
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      [
+        id_produtor,
+        id_variedade,
+        id_comunidade,
+        id_municipio,
+        nome_plantacao,
+        latitude,
+        longitude,
+        altitude_media,
+        nome_talhao,
+      ]
+    );
+    const id_plantacao = res.lastInsertRowId;
+
+    // 2) associa cada face de exposição
+    for (const id_face of faces) {
+      await db.runAsync(
+        `INSERT INTO face_exposicao_plantacao (id_face_exposicao, id_plantacao)
+         VALUES (?, ?);`,
+        [id_face, id_plantacao]
+      );
+    }
+
+    // 3) commita
+    await db.execAsync('COMMIT;');
+
+    Alert.alert('Sucesso', 'Plantação cadastrada com sucesso!');
+    return id_plantacao;
+
+  } catch (error) {
+    // no erro, desfaz a transação
+    try { await db.execAsync('ROLLBACK;'); } catch (_) {/* ignore */}
+    console.error('❌ Erro ao cadastrar plantação:', error);
+    Alert.alert('Erro', 'Não foi possível cadastrar a plantação.');
+    return null;
+  }
+};

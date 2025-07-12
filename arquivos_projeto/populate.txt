@@ -1,26 +1,17 @@
-
-      PRAGMA foreign_keys = ON;
+PRAGMA foreign_keys = ON;
 
 -- -----------------------------------------------------
--- Inserir 5 produtores
+-- 5 produtores
 -- -----------------------------------------------------
 INSERT INTO produtor (nome_produtor, cpf_produtor, codigo_produtor) VALUES
-  ('João Silva',    '12345678901', 'PRD001'),
-  ('Maria Santos',  '23456789012', 'PRD002'),
+  ('João Silva',     '12345678901', 'PRD001'),
+  ('Maria Santos',   '23456789012', 'PRD002'),
   ('Carlos Oliveira','34567890123', 'PRD003'),
-  ('Ana Pereira',   '45678901234', 'PRD004'),
-  ('Paulo Souza',   '56789012345', 'PRD005');
-
--- 1 Insere 5 cooperativas
-INSERT INTO cooperativa (nome_cooperativa) VALUES
-  ('Cooperativa A'),
-  ('Cooperativa B'),
-  ('Cooperativa C'),
-  ('Cooperativa D'),
-  ('Cooperativa E');
+  ('Ana Pereira',    '45678901234', 'PRD004'),
+  ('Paulo Souza',    '56789012345', 'PRD005');
 
 -- -----------------------------------------------------
--- Inserir 5 comunidades
+-- 5 comunidades
 -- -----------------------------------------------------
 INSERT INTO comunidade (id_comunidade, nome_comunidade) VALUES
   (1, 'Comunidade A'),
@@ -30,7 +21,7 @@ INSERT INTO comunidade (id_comunidade, nome_comunidade) VALUES
   (5, 'Comunidade E');
 
 -- -----------------------------------------------------
--- Inserir 5 municípios
+-- 5 municípios
 -- -----------------------------------------------------
 INSERT INTO municipio (id_municipio, nome_municipio) VALUES
   (1, 'Município X'),
@@ -40,7 +31,17 @@ INSERT INTO municipio (id_municipio, nome_municipio) VALUES
   (5, 'Município V');
 
 -- -----------------------------------------------------
--- Inserir 5 variedades
+-- 5 cooperativas
+-- -----------------------------------------------------
+INSERT INTO cooperativa (nome_cooperativa) VALUES
+  ('Cooperativa Alpha'),
+  ('Cooperativa Beta'),
+  ('Cooperativa Gama'),
+  ('Cooperativa Delta'),
+  ('Cooperativa Épsilon');
+
+-- -----------------------------------------------------
+-- 5 variedades
 -- -----------------------------------------------------
 INSERT INTO variedade (nome_variedade) VALUES
   ('BRS Capiaçu'),
@@ -50,7 +51,7 @@ INSERT INTO variedade (nome_variedade) VALUES
   ('Icatu');
 
 -- -----------------------------------------------------
--- Inserir 5 faces de exposição
+-- 5 faces de exposição
 -- -----------------------------------------------------
 INSERT INTO face_exposicao (nome_face_exposicao) VALUES
   ('Norte'),
@@ -60,30 +61,49 @@ INSERT INTO face_exposicao (nome_face_exposicao) VALUES
   ('Nordeste');
 
 -- -----------------------------------------------------
--- Exemplo: Inserir 5 plantações de teste
+-- 5 plantações (uma para cada produtor)
 -- -----------------------------------------------------
 INSERT INTO plantacao (
-  id_produtor,
-  id_variedade,
-  id_comunidade,
-  id_municipio,
-  nome_plantacao,
-  latitude,
-  longitude,
-  altitude_media,
-  nome_talhao,
-  id_face_exposicao
+  id_produtor, id_variedade, id_comunidade, id_municipio,
+  nome_plantacao, latitude, longitude, altitude_media, nome_talhao
 ) VALUES
-  (1, 1, 1, 1, 'Plantação João A',  -23.550520, -46.633308, '900', 'Talhão 1', 1),
-  (2, 2, 2, 2, 'Plantação Maria B',  -22.903539, -43.209587, '800', 'Talhão 2', 2),
-  (3, 3, 3, 3, 'Plantação Carlos C', -15.794229, -47.882166, '1000','Talhão 3', 3),
-  (4, 4, 4, 4, 'Plantação Ana D',     -19.919130, -43.938607, '850', 'Talhão 4', 4),
-  (5, 5, 5, 5, 'Plantação Paulo E',   -8.047562,  -34.877,    '50',  'Talhão 5', 5);
+  (1, 1, 1, 1, 'Plantação João',    '-23.550520', '-46.633308', '900', 'Talhão A'),
+  (2, 2, 2, 2, 'Plantação Maria',   '-22.903539', '-43.209587', '800', 'Talhão B'),
+  (3, 3, 3, 3, 'Plantação Carlos',  '-15.794229', '-47.882166', '1000','Talhão C'),
+  (4, 4, 4, 4, 'Plantação Ana',     '-19.919130', '-43.938607', '850', 'Talhão D'),
+  (5, 5, 5, 5, 'Plantação Paulo',   '-08.047562', '-34.877000', '50',  'Talhão E');
 
-INSERT INTO cooperativa_produtor (id_cooperativa, id_produtor)
-VALUES
-  ( 1, 1),
-  ( 2, 2),
-  ( 3, 3),
-  ( 4, 4),
+-- -----------------------------------------------------
+-- Associação de cada produtor a uma cooperativa
+-- -----------------------------------------------------
+INSERT INTO cooperativa_produtor (id_cooperativa, id_produtor) VALUES
+  (1, 1),
+  (2, 2),
+  (3, 3),
+  (4, 4),
+  (5, 5);
+
+-- -----------------------------------------------------
+-- 3 faces de exposição por plantação
+-- -----------------------------------------------------
+INSERT INTO face_exposicao_plantacao (id_face_exposicao, id_plantacao) VALUES
+  -- para plantacao 1
+  (1, 1),
+  (2, 1),
+  (3, 1),
+  -- para plantacao 2
+  (1, 2),
+  (4, 2),
+  (5, 2),
+  -- para plantacao 3
+  (2, 3),
+  (3, 3),
+  (4, 3),
+  -- para plantacao 4
+  (1, 4),
+  (3, 4),
+  (5, 4),
+  -- para plantacao 5
+  (2, 5),
+  (4, 5),
   (5, 5);
