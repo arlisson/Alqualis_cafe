@@ -52,7 +52,7 @@ export default function Visualizar() {
             : 'Não participa',
         cpf_produtor:
           item.cpf_produtor && item.cpf_produtor.trim() !== ''
-            ? item.cpf_produtor
+            ? item.cpf_produtor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
             : 'Não informado',
       }));
       if (regs.length) {

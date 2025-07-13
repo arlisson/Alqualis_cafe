@@ -11,6 +11,7 @@ import { inserirGenerico } from '../../database/database';
 export default function OutrosCadastros() {
   const { label, id } = useLocalSearchParams();
   const [nome, setNome] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   // Map de ID → tabela, campo e mensagem de sucesso
   const cadastroMap = {
@@ -37,6 +38,8 @@ export default function OutrosCadastros() {
   };
 
   const handleSalvar = async () => {
+    setFormSubmitted(true);
+
     if (!nome.trim()) {
       Alert.alert('Atenção!', 'O nome não pode estar vazio.');
       return;
@@ -49,7 +52,7 @@ export default function OutrosCadastros() {
     }
 
     try {
-      const payload = { [config.field]: nome };
+      const payload = { [config.field]: nome.toUpperCase() };
       const resultId = await inserirGenerico(
         config.table,
         payload,
@@ -58,6 +61,7 @@ export default function OutrosCadastros() {
       if (resultId) {
         console.log(`✅ ${label} cadastrado(a) com ID: ${resultId}`);
         setNome('');
+        setFormSubmitted(false);
       }
     } catch (error) {
       console.error(`❌ Erro ao cadastrar ${label}:`, error);
@@ -65,11 +69,25 @@ export default function OutrosCadastros() {
     }
   };
 
+  const config = cadastroMap[id];
+
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde }}>
       <HeaderTitle texto={`Cadastrar ${label}`} voltar="true" home="true" />
       <ViewCenter>
-        <Label label="Nome" input="true" onChangeText={setNome} value={nome} validateOnProp={true} />
+        <Label
+          label="Nome"
+          input={true}
+          onChangeText={setNome}
+          value={nome}
+          required
+          showError={formSubmitted}
+          verificarDuplicado={{
+            tabela: config?.table,
+            campo: config?.field,
+          }}
+          mensagemDuplicadoPersonalizada={`Já existe um(a) ${label?.toLowerCase()} com esse nome.`}
+        />
       </ViewCenter>
       <Botao texto="Salvar" onPress={handleSalvar} />
     </View>

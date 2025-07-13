@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
 import DropdownComponent from './DropDownComponent';
 import stylesGeral from '../../assets/styles/stylesGeral';
+import { buscarRegistrosGenericos } from '../../database/database';
 
 const formatCPF = (value = '') => {
   const digits = value.replace(/\D+/g, '');
@@ -48,6 +49,8 @@ export default function Label({
   mask = null,
   required = false,
   showError = false, // NOVO: controle de erro pelo componente pai
+  verificarDuplicado = null, // { tabela: 'produtor', campo: 'codigo_produtor' }
+
 }) {
   const [internalModalVisible, setInternalModalVisible] = useState(false);
   const isExternal = Array.isArray(value) && typeof onChangeText === 'function';
@@ -60,6 +63,43 @@ export default function Label({
 
   const isEmpty = typeof value === 'string' && value.trim() === '';
   const showValidationError = showError && required && isEmpty;
+
+  const [valorDuplicado, setValorDuplicado] = useState(false);
+  const [mensagemDuplicado, setMensagemDuplicado] = useState('');
+  const debounceTimeout = useRef(null);
+
+  const checarDuplicado = async (textoNormalizado) => {
+  if (!verificarDuplicado || !textoNormalizado) {
+    setValorDuplicado(false);
+    setMensagemDuplicado('');
+    return;
+  }
+
+  try {
+    const registros = await buscarRegistrosGenericos(verificarDuplicado.tabela);
+
+    const existe = registros.some((r) => {
+      const valorBanco = r[verificarDuplicado.campo];
+      if (!valorBanco) return false;
+
+      const comparavel = verificarDuplicado.campo === 'cpf_produtor'
+        ? valorBanco.replace(/\D/g, '')
+        : valorBanco.trim().toUpperCase();
+
+      return comparavel === textoNormalizado;
+    });
+
+    if (existe) {
+      setValorDuplicado(true);
+      setMensagemDuplicado(`Este(a) ${label} já está cadastrado(a)!`);
+    } else {
+      setValorDuplicado(false);
+      setMensagemDuplicado('');
+    }
+  } catch (e) {
+    console.error('Erro ao verificar duplicidade:', e);
+  }
+};
 
   const handleToggleItem = (item) => {
     setSelectedItems((prev) =>
@@ -93,11 +133,30 @@ export default function Label({
 
   const handleTextChange = (text) => {
     let formatted = text;
+
     if (mask === 'cpf') {
-      formatted = formatCPF(text);
+      formatted = formatCPF(text); // máscara visual
     }
-    onChangeText(formatted);
+
+    onChangeText(formatted); // atualiza valor visível no input
+
+    if (verificarDuplicado) {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+      debounceTimeout.current = setTimeout(() => {
+        let normalizado;
+
+        if (mask === 'cpf') {
+          normalizado = text.replace(/\D/g, ''); // somente dígitos
+        } else {
+          normalizado = text.trim().toUpperCase(); // para campos tipo código
+        }
+
+        checarDuplicado(normalizado);
+      }, 300);
+    }
   };
+
 
   if (horizontal) {
     return (
@@ -126,6 +185,9 @@ export default function Label({
         </View>
         {showValidationError && (
           <Text style={styles.errorText}>Campo obrigatório</Text>
+        )}
+        {valorDuplicado && (
+          <Text style={styles.errorText}>{mensagemDuplicado}</Text>
         )}
       </View>
     );
@@ -161,6 +223,9 @@ export default function Label({
           {showValidationError && (
             <Text style={styles.errorText}>Campo obrigatório</Text>
           )}
+          {valorDuplicado && (
+            <Text style={styles.errorText}>{mensagemDuplicado}</Text>
+          )}
         </>
       )}
 
@@ -178,6 +243,9 @@ export default function Label({
           </View>
           {showValidationError && (
             <Text style={styles.errorText}>Campo obrigatório</Text>
+          )}
+          {valorDuplicado && (
+            <Text style={styles.errorText}>{mensagemDuplicado}</Text>
           )}
         </View>
       )}

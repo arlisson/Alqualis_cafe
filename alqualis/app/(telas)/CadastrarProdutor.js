@@ -47,21 +47,39 @@ export default function CadastrarProdutor() {
 
   try {
     const payload = {
-      nome_produtor: nome.trim(),
-      cpf_produtor: cpf.trim() || null,
-      codigo_produtor: codigo.trim(),
+      nome_produtor: nome.trim().toUpperCase(),
+      cpf_produtor: cpf ? cpf.replace(/\D/g, '') : null,
+      codigo_produtor: codigo.trim().toUpperCase(),
       id_cooperativa: coop ? parseInt(coop.value, 10) : null,
     };
+
     const id = await inserirProdutor(payload);
-    if (id) Alert.alert('Sucesso', 'Produtor cadastrado!');
+
+    if (id) {
+      //Alert.alert('Sucesso', 'Produtor cadastrado!');
+
+      // 🔁 Limpa formulário
+      setNome('');
+      setCpf('');
+      setCodigo('');
+      setCoop(null);
+      setFormSubmitted(false);
+
+      // 🔁 Atualiza dados
+      const prods = await buscarRegistrosGenericos('produtor');
+      setProdList(prods);
+      if (prods.length) {
+        const last = prods.reduce((a, b) => (a.id_produtor > b.id_produtor ? a : b));
+        setLastCode(last.codigo_produtor || '');
+      }
+    }
   } catch {
     Alert.alert('Erro', 'Não foi possível cadastrar');
   }
 };
 
-
   return (
-    <View style={{ flex: 1, backgroundColor: Cores.verde }}>
+    <View style={{ flex: 1, backgroundColor: Cores.verde,paddingBottom: RFValue(30) }}>
       <HeaderTitle texto='Cadastrar Produtor' voltar='true' home='true' />
       <ViewCenter>
         <Label
@@ -78,11 +96,8 @@ export default function CadastrarProdutor() {
           value={cpf}
           onChangeText={setCpf}
           mask='cpf'
-          showError={formSubmitted}
-          existingValues={prodList
-            .map(p => typeof p.cpf_produtor === 'string' ? p.cpf_produtor.replace(/\D/g, '') : '')
-            .filter(Boolean)}
-
+          showError={formSubmitted}          
+          verificarDuplicado={{ tabela: 'produtor', campo: 'cpf_produtor' }}
         />
         <Label
           label='Código'
@@ -90,8 +105,8 @@ export default function CadastrarProdutor() {
           value={codigo}
           onChangeText={setCodigo}
           required
-          showError={formSubmitted}
-          existingValues={prodList.map(p => p.codigo_produtor)}
+          showError={formSubmitted}          
+          verificarDuplicado={{ tabela: 'produtor', campo: 'codigo_produtor' }}
         />
         <Text style={styles.lastCode}>
           Último código: {lastCode || 'Nenhum'}
@@ -101,14 +116,14 @@ export default function CadastrarProdutor() {
           dropdown
           value={coop}
           onChangeText={setCoop}
-          dropdownData={coopOptions}
+          data={coopOptions}
         />
         <TouchableOpacity style={styles.checkbox} onPress={() => setCoop(null)}>
           <Ionicons name={coop ? 'square-outline' : 'checkbox-outline'} size={RFValue(20)} />
           <Text style={styles.checkboxLabel}>Não é associado</Text>
         </TouchableOpacity>
-      </ViewCenter>
-      <Botao texto='Salvar' onPress={handleSalvar} />
+      </ViewCenter>      
+      <Botao texto='Salvar' onPress={handleSalvar} />   
     </View>
   );
 }
@@ -123,7 +138,7 @@ const styles = StyleSheet.create({
   checkbox: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: RFValue(10),
+    paddingLeft: RFValue(16),
   },
   checkboxLabel: {
     marginLeft: RFValue(8),

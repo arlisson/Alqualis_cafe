@@ -275,7 +275,6 @@ export default function CadastrarPlantacao() {
           </View>
         </Modal>
       </ViewCenter>
-
       <Botao texto='Salvar' onPress={handleSalvar} />
     </View>
   );

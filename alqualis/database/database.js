@@ -1,19 +1,17 @@
 import * as SQLite from "expo-sqlite";
 import { Alert } from "react-native";
-import * as FileSystem from "expo-file-system";
+
 
 let db = null;
 const DB_NAME = "alqualis";
 
-/**
- * Abre (ou retorna) a conexão SQLite
- */
-export const openDatabase = () => {
+export const openDatabase = async () => {
   if (!db) {
-    db = SQLite.openDatabaseSync(DB_NAME);
+    db = await SQLite.openDatabaseAsync(DB_NAME);
   }
   return db;
 };
+
 
 /**
  * @description Remove o arquivo do banco (apenas para testes/development)
@@ -39,7 +37,7 @@ export const deleteDatabase = async () => {
  * @description Cria as tabelas iniciais
  */
 export const createDatabase = async (mensagem = true) => {
-  const database = openDatabase();
+  const database = await openDatabase();
 
   try {
     await database.execAsync(`
@@ -186,10 +184,35 @@ export const inserirProdutor = async ({
     Alert.alert("Erro", "O nome do produtor é obrigatório.");
     return null;
   }
-  const database = openDatabase();
+
+  const database = await openDatabase();
 
   try {
-    // insere produtor
+    // 🔍 Verifica se CPF já existe (se fornecido)
+    if (cpf_produtor) {
+      const existeCPF = await database.getFirstAsync(
+        `SELECT 1 FROM produtor WHERE cpf_produtor = ? LIMIT 1;`,
+        [cpf_produtor]
+      );
+      if (existeCPF) {
+        Alert.alert("Erro", "Este CPF já está cadastrado.");
+        return null;
+      }
+    }
+
+    // 🔍 Verifica se Código já existe (se fornecido)
+    if (codigo_produtor) {
+      const existeCodigo = await database.getFirstAsync(
+        `SELECT 1 FROM produtor WHERE codigo_produtor = ? LIMIT 1;`,
+        [codigo_produtor]
+      );
+      if (existeCodigo) {
+        Alert.alert("Erro", "Este código de produtor já está cadastrado.");
+        return null;
+      }
+    }
+
+    // ✅ Insere produtor
     const result = await database.runAsync(
       `INSERT INTO produtor (nome_produtor, cpf_produtor, codigo_produtor)
        VALUES (?, ?, ?);`,
@@ -197,7 +220,7 @@ export const inserirProdutor = async ({
     );
     const id = result.lastInsertRowId;
 
-    // associa cooperativa, se informado
+    // 🔗 Associa cooperativa (se houver)
     if (id_cooperativa) {
       await database.runAsync(
         `INSERT INTO cooperativa_produtor (id_cooperativa, id_produtor)
@@ -208,12 +231,14 @@ export const inserirProdutor = async ({
 
     Alert.alert("Sucesso", "Produtor cadastrado com sucesso!");
     return id;
+
   } catch (error) {
     console.error("❌ Erro ao inserir produtor:", error);
     Alert.alert("Erro", "Erro ao cadastrar o produtor.");
     return null;
   }
 };
+
 
 /**
  * @description Associa produtor ↔ cooperativa
@@ -229,7 +254,7 @@ export const associarProdutorCooperativa = async ({
     Alert.alert("Erro", "Produtor e Cooperativa devem ser informados.");
     return false;
   }
-  const database = openDatabase();
+  const database = await openDatabase();
 
   try {
     await database.runAsync(
@@ -251,7 +276,7 @@ export const associarProdutorCooperativa = async ({
  * @param {*} nomeTabela
  */
 export const buscarRegistrosGenericos = async (nomeTabela) => {
-  const database = openDatabase();
+  const database = await openDatabase();
   try {
     const rows = await database.getAllAsync(
       `SELECT * FROM ${nomeTabela};`
@@ -272,30 +297,44 @@ export const buscarRegistrosGenericos = async (nomeTabela) => {
  * @returns {Promise<number|null>} ID inserido ou null em caso de erro
  */
 export const inserirGenerico = async (table, data, successMessage) => {
-  // valida entrada
   const entries = Object.entries(data);
   if (entries.length !== 1) {
     throw new Error("inserirGenerico precisa de exatamente uma coluna/valor");
   }
+
   const [column, value] = entries[0];
-  if (value == null || value.toString().trim() === "") {
+  const valor = value?.toString().trim();
+
+  if (!valor) {
     Alert.alert("Erro", `O campo ${column} é obrigatório.`);
     return null;
   }
 
-  const db = openDatabase();
-  const sql = `INSERT INTO ${table} (${column}) VALUES (?);`;
+  const db = await openDatabase();
 
   try {
-    const result = await db.runAsync(sql, [value]);
+    // Verificação se já existe
+    const checkSql = `SELECT 1 FROM ${table} WHERE ${column} = ? LIMIT 1;`;
+    const existing = await db.getFirstAsync(checkSql, [valor]);
+
+    if (existing) {
+      Alert.alert("Aviso", `O valor "${valor}" já está cadastrado em ${table}.`);
+      return null;
+    }
+
+    // Inserção
+    const insertSql = `INSERT INTO ${table} (${column}) VALUES (?);`;
+    const result = await db.runAsync(insertSql, [valor]);
     Alert.alert("Sucesso", successMessage);
     return result.lastInsertRowId;
+
   } catch (error) {
     console.error(`❌ Erro ao inserir em ${table}:`, error);
     Alert.alert("Erro", `Erro ao cadastrar em ${table}.`);
     return null;
   }
 };
+
 
 /**
  * @description Busca todos os produtores com todos os seus campos, 
@@ -348,7 +387,7 @@ export async function buscarProdutoresCooperativa() {
  *     faces_exposicao  // ex: "Norte, Sul, Leste"
  */
 export async function buscarPlantacoesDetalhadas() {
-  const db = openDatabase();
+  const db = await openDatabase();
   const sql = `
     SELECT
       p.id_plantacao,
@@ -417,7 +456,7 @@ export const inserirPlantacao = async ({
   nome_talhao = null,
   faces = [],
 }) => {
-  const db = openDatabase();
+  const db = await openDatabase();
 
   // validação mínima
   if (!id_produtor || !id_variedade || !id_comunidade || !id_municipio || !nome_plantacao) {
