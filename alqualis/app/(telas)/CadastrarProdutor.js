@@ -8,7 +8,10 @@ import ViewCenter from '../../components/personalizados/ViewCenter';
 import Label from '../../components/personalizados/Label';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
-import { buscarRegistrosGenericos, inserirProdutor } from '../../database/database';
+import { buscarRegistrosGenericos,
+  inserirProdutor, 
+  buscarProdutorPorId} from '../../database/database';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function CadastrarProdutor() {
   const [nome, setNome] = useState('');
@@ -20,6 +23,40 @@ export default function CadastrarProdutor() {
   const [coopOptions, setCoopOptions] = useState([]);
   const [lastCode, setLastCode] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const {id_produtor} = useLocalSearchParams();
+
+  useEffect(() => {
+    
+  if (!id_produtor) return;
+
+  (async () => {
+    try {
+      const produtor = await buscarProdutorPorId(Number(id_produtor));
+      //console.log(produtor);
+      if (produtor) {
+        
+        setNome(produtor[0].nome_produtor || '');
+        setCpf(produtor[0].cpf_produtor || '');
+        setCodigo(produtor[0].codigo_produtor || '');
+
+        if (produtor[0].id_cooperativa && produtor[0].cooperativa) {
+          setCoop({
+            label: produtor[0].cooperativa,
+            value: produtor[0].id_cooperativa.toString()
+          });
+                  
+        } else {
+          setCoop(null);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar produtor:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os dados do produtor.');
+    }
+  })();
+}, [id_produtor]);
+
 
   useEffect(() => {
     (async () => {
@@ -122,8 +159,17 @@ export default function CadastrarProdutor() {
           <Ionicons name={coop ? 'square-outline' : 'checkbox-outline'} size={RFValue(20)} />
           <Text style={styles.checkboxLabel}>Não é associado</Text>
         </TouchableOpacity>
-      </ViewCenter>      
-      <Botao texto='Salvar' onPress={handleSalvar} />   
+      </ViewCenter> 
+      {!id_produtor &&
+        <Botao texto='Salvar' onPress={handleSalvar} /> 
+      }     
+      
+      {id_produtor &&
+      <>
+        <Botao texto='Editar' onPress={()=>console.log('sim')} cor={Cores.azul} foto = 'create-outline'/> 
+        <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
+      </>
+      }  
     </View>
   );
 }

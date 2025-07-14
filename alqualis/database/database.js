@@ -365,6 +365,37 @@ export async function buscarProdutoresCooperativa() {
 }
 
 /**
+ * @description Busca um produtor pelo ID com todos os seus campos,
+ * e adiciona também o nome da cooperativa (ou null) e o id da cooperativa.
+ *
+ * @param {number} idProdutor - ID do produtor a ser buscado
+ * @returns {Promise<Object|null>} Objeto com os dados do produtor, `cooperativa` e `id_cooperativa`, ou `null`
+ */
+export async function buscarProdutorPorId(idProdutor) {
+  const db = await openDatabase();
+  const sql = `
+    SELECT
+      p.*,
+      cp.id_cooperativa,
+      c.nome_cooperativa AS cooperativa
+    FROM produtor p
+    LEFT JOIN cooperativa_produtor cp
+      ON cp.id_produtor = p.id_produtor
+    LEFT JOIN cooperativa c
+      ON c.id_cooperativa = cp.id_cooperativa
+    WHERE p.id_produtor = ?;
+  `;
+  try {
+    const row = await db.getAllAsync(sql, [idProdutor]);
+    return row || null;
+  } catch (error) {
+    console.error('❌ Erro ao buscar produtor por ID com cooperativa:', error);
+    throw error;
+  }
+}
+
+
+/**
  * @description Busca todas as plantações, substituindo
  * - id_produtor   → nome_produtor
  * - id_variedade  → nome_variedade

@@ -4,7 +4,7 @@ import HeaderTitle from '../../components/personalizados/headerTtitle';
 import Cores from '../../constants/Cores';
 import ViewCenter from '../../components/personalizados/ViewCenter';
 import Label from '../../components/personalizados/Label';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import Tabela from '../../components/personalizados/Tabela';
 import {
   buscarRegistrosGenericos,
@@ -102,6 +102,11 @@ export default function Visualizar() {
     row.forEach(({ label, value }) => {
       console.log(`${label}: ${value}`);
     });
+    if(parseInt(id)===1){
+      router.push({pathname:'(telas)/CadastrarProdutor',
+        params:{id_produtor:row[0].value}
+      })
+    }
   };
 
   return (

@@ -77,8 +77,8 @@ export default function Index() {
           pathname:'(telas)/Visualizar',
           params:{titulo:'Variedade', id:'7'}})}/>
 
-        <Botao texto='Criar Banco' cor='blue' onPress={()=>handleCriarBanco()} />
-        <Botao texto='Apagar Banco' cor='red' onPress={() => deleteDatabase()} />
+        <Botao texto='Criar Banco' cor={Cores.azul} onPress={()=>handleCriarBanco()} />
+        <Botao texto='Apagar Banco' cor={Cores.vermelho} onPress={() => deleteDatabase()} foto='trash-outline'/>
       </ViewCenter>
       
     </View>
