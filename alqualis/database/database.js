@@ -487,13 +487,24 @@ export async function buscarPlantacaoPorId(idPlantacao) {
   `;
 
   try {
-    // Busca os dados da plantação
-    const plantacao = await db.getAllAsync(sqlPlantacao, [idPlantacao]);
+    // Busca a plantação (como array)
+    const rows = await db.getAllAsync(sqlPlantacao, [idPlantacao]);
+    const plantacao = rows[0]; // ✅ Pega o primeiro registro
+
     if (!plantacao) return null;
 
     // Busca as faces associadas
     const faces = await db.getAllAsync(sqlFaces, [idPlantacao]);
     plantacao.faces = faces.map(f => f.id_face_exposicao);
+
+    // Trata meses_colheita
+    try {
+      plantacao.meses_colheita = plantacao.meses_colheita
+        ? JSON.parse(plantacao.meses_colheita)
+        : [];
+    } catch {
+      plantacao.meses_colheita = [];
+    }
 
     return plantacao;
 
@@ -503,7 +514,6 @@ export async function buscarPlantacaoPorId(idPlantacao) {
     return null;
   }
 }
-
 
 /**
  * Insere uma plantação e associa múltiplas faces de exposição a ela.

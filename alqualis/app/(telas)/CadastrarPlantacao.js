@@ -17,8 +17,9 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import {
   buscarRegistrosGenericos,
   inserirPlantacao,
+  buscarPlantacaoPorId
 } from '../../database/database';
-
+import { router, useLocalSearchParams } from 'expo-router';
 export default function CadastrarPlantacao() {
   const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -30,6 +31,68 @@ export default function CadastrarPlantacao() {
   const [variedadesOptions, setVariedadesOptions] = useState([]);
   const [comunidadesOptions, setComunidadesOptions] = useState([]);
   const [municipiosOptions, setMunicipiosOptions] = useState([]);
+
+  const {id_plantacao} = useLocalSearchParams();
+  /**
+   * @description UseEffect para recuperar os dados de uma plantação para edição
+   */
+  useEffect(() => {
+  if (
+    !id_plantacao ||
+    produtoresOptions.length === 0 ||
+    variedadesOptions.length === 0 ||
+    comunidadesOptions.length === 0 ||
+    municipiosOptions.length === 0 ||
+    facesRows.length === 0
+  ) return;
+
+  (async () => {
+    try {
+      const resultado = await buscarPlantacaoPorId(Number(id_plantacao));
+      const dados = Array.isArray(resultado) ? resultado[0] : resultado;
+      //console.log(dados)
+      if (!dados) return;
+
+      // Nome e localização
+      setNomePropriedade(dados.nome_plantacao || '');
+      setNomeTalhao(dados.nome_talhao || '');
+      setLatitude(dados.latitude || '');
+      setLongitude(dados.longitude || '');
+      setAltitude(dados.altitude_media || '');
+
+      // Meses
+      setMesesSelecionados(dados.meses_colheita || []);
+
+      // Faces de exposição: busca os nomes a partir dos IDs
+      const nomesFaces = facesRows
+        .filter(f => dados.faces.includes(f.id_face_exposicao))
+        .map(f => f.nome_face_exposicao);
+      setFacesSelecionadas(nomesFaces);
+
+      // Dropdowns
+      const safeFind = (lista, id) =>
+        lista.find(item => item.value === id.toString()) || { label: '', value: id.toString() };
+
+      setProdutor(safeFind(produtoresOptions, dados.id_produtor));
+      setVariedade(safeFind(variedadesOptions, dados.id_variedade));
+      setComunidade(safeFind(comunidadesOptions, dados.id_comunidade));
+      setMunicipio(safeFind(municipiosOptions, dados.id_municipio));
+
+    } catch (error) {
+      console.error('Erro ao carregar dados da plantação:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os dados da plantação.');
+    }
+  })();
+}, [
+  id_plantacao,
+  produtoresOptions,
+  variedadesOptions,
+  comunidadesOptions,
+  municipiosOptions,
+  facesRows
+]);
+
+
 
   useEffect(() => {
     (async () => {
@@ -277,7 +340,16 @@ export default function CadastrarPlantacao() {
           </View>
         </Modal>
       </ViewCenter>
-      <Botao texto='Salvar' onPress={handleSalvar} />
+      {!id_plantacao &&
+        <Botao texto='Salvar' onPress={handleSalvar} /> 
+      }     
+      
+      {id_plantacao &&
+      <>
+        <Botao texto='Editar' onPress={()=>console.log('sim')} cor={Cores.azul} foto = 'create-outline'/> 
+        <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
+      </>
+      }  
     </View>
   );
 }
