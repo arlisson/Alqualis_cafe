@@ -102,11 +102,25 @@ export default function Visualizar() {
     row.forEach(({ label, value }) => {
       console.log(`${label}: ${value}`);
     });
-    if(parseInt(id)===1){
-      router.push({pathname:'(telas)/CadastrarProdutor',
+    switch (parseInt(id)) {
+      case 1:
+        router.push({pathname:'(telas)/CadastrarProdutor',
         params:{id_produtor:row[0].value}
       })
+      break;
+      case 2:
+        router.push({pathname:'(telas)/CadastrarPlantacao',
+          params:{id_plantacao:row[0].value}
+        })
+      break;
+
+      default:
+        router.push({pathname:'(telas)/OutrosCadastros',
+          params:{id_cadastro:row[0].value, id}
+        })
+      break;
     }
+   
   };
 
   return (

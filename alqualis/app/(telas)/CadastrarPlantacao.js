@@ -129,6 +129,8 @@ export default function CadastrarPlantacao() {
         altitude_media: altitude,
         nome_talhao: nomeTalhao.toUpperCase(),
         faces: facesIds,
+        meses_colheita: mesesSelecionados,
+
       });
 
       if (newId) {

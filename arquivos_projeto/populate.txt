@@ -65,13 +65,13 @@ INSERT INTO face_exposicao (nome_face_exposicao) VALUES
 -- -----------------------------------------------------
 INSERT INTO plantacao (
   id_produtor, id_variedade, id_comunidade, id_municipio,
-  nome_plantacao, latitude, longitude, altitude_media, nome_talhao
+  nome_plantacao, latitude, longitude, altitude_media, nome_talhao, meses_colheita
 ) VALUES
-  (1, 1, 1, 1, 'Plantação João',    '-23.550520', '-46.633308', '900', 'Talhão A'),
-  (2, 2, 2, 2, 'Plantação Maria',   '-22.903539', '-43.209587', '800', 'Talhão B'),
-  (3, 3, 3, 3, 'Plantação Carlos',  '-15.794229', '-47.882166', '1000','Talhão C'),
-  (4, 4, 4, 4, 'Plantação Ana',     '-19.919130', '-43.938607', '850', 'Talhão D'),
-  (5, 5, 5, 5, 'Plantação Paulo',   '-08.047562', '-34.877000', '50',  'Talhão E');
+  (1, 1, 1, 1, 'Plantação João',    '-23.550520', '-46.633308', '900', 'Talhão A','Janeiro'),
+  (2, 2, 2, 2, 'Plantação Maria',   '-22.903539', '-43.209587', '800', 'Talhão B','Fevereiro'),
+  (3, 3, 3, 3, 'Plantação Carlos',  '-15.794229', '-47.882166', '1000','Talhão C',  'Março'),
+  (4, 4, 4, 4, 'Plantação Ana',     '-19.919130', '-43.938607', '850', 'Talhão D','Janeiro'),
+  (5, 5, 5, 5, 'Plantação Paulo',   '-08.047562', '-34.877000', '50',  'Talhão E','Janeiro');
 
 -- -----------------------------------------------------
 -- Associação de cada produtor a uma cooperativa

@@ -99,6 +99,7 @@ export const createDatabase = async (mensagem = true) => {
         longitude          TEXT,
         altitude_media     TEXT,
         nome_talhao        TEXT,
+        meses_colheita     TEXT, 
         -- removemos o campo 'face_exposicao' aqui porque agora teremos tabela de junção
         FOREIGN KEY (id_produtor)       REFERENCES produtor(id_produtor),
         FOREIGN KEY (id_variedade)      REFERENCES variedade(id_variedade),
@@ -146,9 +147,7 @@ export const createDatabase = async (mensagem = true) => {
       );
 
       CREATE INDEX IF NOT EXISTS idx_fep_face       ON face_exposicao_plantacao(id_face_exposicao);
-      CREATE INDEX IF NOT EXISTS idx_fep_plantacao  ON face_exposicao_plantacao(id_plantacao);
-
-      
+      CREATE INDEX IF NOT EXISTS idx_fep_plantacao  ON face_exposicao_plantacao(id_plantacao);     
       
 
     `);
@@ -402,6 +401,7 @@ export async function buscarProdutorPorId(idProdutor) {
  * - id_comunidade → nome_comunidade
  * - id_municipio  → nome_municipio
  * E agrupando todas as faces de exposição numa coluna `faces_exposicao`
+ * e os meses de colheita como array.
  *
  * @returns {Promise<Array<Object>>} 
  *   Cada objeto terá:
@@ -415,7 +415,8 @@ export async function buscarProdutorPorId(idProdutor) {
  *     longitude,
  *     altitude_media,
  *     nome_talhao,
- *     faces_exposicao  // ex: "Norte, Sul, Leste"
+ *     faces_exposicao,  // ex: "Norte, Sul, Leste"
+ *     meses_colheita    // ex: ["Janeiro", "Março"]
  */
 export async function buscarPlantacoesDetalhadas() {
   const db = await openDatabase();
@@ -431,7 +432,7 @@ export async function buscarPlantacoesDetalhadas() {
       p.longitude,
       p.altitude_media,
       p.nome_talhao,
-      -- concatena todas as faces, separadas por vírgula e espaço
+      p.meses_colheita,
       GROUP_CONCAT(fe.nome_face_exposicao, ', ') AS faces_exposicao
     FROM plantacao p
     LEFT JOIN produtor pr
@@ -442,7 +443,6 @@ export async function buscarPlantacoesDetalhadas() {
       ON co.id_comunidade = p.id_comunidade
     LEFT JOIN municipio mu
       ON mu.id_municipio = p.id_municipio
-    -- junta via tabela de relação N:N
     LEFT JOIN face_exposicao_plantacao fep
       ON fep.id_plantacao = p.id_plantacao
     LEFT JOIN face_exposicao fe
@@ -452,12 +452,58 @@ export async function buscarPlantacoesDetalhadas() {
   `;
   try {
     const rows = await db.getAllAsync(sql);
-    return rows;
+
+    // converte meses_colheita de JSON para array
+    return rows.map(row => ({
+      ...row,
+      meses_colheita: row.meses_colheita ? JSON.parse(row.meses_colheita) : []
+    }));
   } catch (error) {
     console.error('❌ Erro ao buscar plantações detalhadas:', error);
     throw error;
   }
 }
+
+
+/**
+ * @description Busca uma plantação pelo ID, incluindo todas as faces de exposição associadas.
+ *
+ * @param {number} idPlantacao - ID da plantação a ser buscada
+ * @returns {Promise<Object|null>} Objeto com dados da plantação e um array `faces` com os IDs das exposições, ou null se não encontrada
+ */
+export async function buscarPlantacaoPorId(idPlantacao) {
+  const db = await openDatabase();
+
+  const sqlPlantacao = `
+    SELECT *
+    FROM plantacao
+    WHERE id_plantacao = ?;
+  `;
+
+  const sqlFaces = `
+    SELECT id_face_exposicao
+    FROM face_exposicao_plantacao
+    WHERE id_plantacao = ?;
+  `;
+
+  try {
+    // Busca os dados da plantação
+    const plantacao = await db.getAllAsync(sqlPlantacao, [idPlantacao]);
+    if (!plantacao) return null;
+
+    // Busca as faces associadas
+    const faces = await db.getAllAsync(sqlFaces, [idPlantacao]);
+    plantacao.faces = faces.map(f => f.id_face_exposicao);
+
+    return plantacao;
+
+  } catch (error) {
+    console.error('❌ Erro ao buscar plantação por ID:', error);
+    Alert.alert('Erro', 'Não foi possível carregar os dados da plantação.');
+    return null;
+  }
+}
+
 
 /**
  * Insere uma plantação e associa múltiplas faces de exposição a ela.
@@ -486,6 +532,7 @@ export const inserirPlantacao = async ({
   altitude_media = null,
   nome_talhao = null,
   faces = [],
+  meses_colheita=null
 }) => {
   const db = await openDatabase();
 
@@ -503,8 +550,8 @@ export const inserirPlantacao = async ({
     const res = await db.runAsync(
       `INSERT INTO plantacao (
         id_produtor, id_variedade, id_comunidade, id_municipio,
-        nome_plantacao, latitude, longitude, altitude_media, nome_talhao
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+        nome_plantacao, latitude, longitude, altitude_media, nome_talhao, meses_colheita
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
       [
         id_produtor,
         id_variedade,
@@ -515,8 +562,10 @@ export const inserirPlantacao = async ({
         longitude,
         altitude_media,
         nome_talhao,
+        JSON.stringify(meses_colheita) // 👈 Salva como JSON string
       ]
     );
+
     const id_plantacao = res.lastInsertRowId;
 
     // 2) associa cada face de exposição
@@ -542,6 +591,8 @@ export const inserirPlantacao = async ({
     return null;
   }
 };
+
+
 /**
  * 
  * @param {*} tabela 
