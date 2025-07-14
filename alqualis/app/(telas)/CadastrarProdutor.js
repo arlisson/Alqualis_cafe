@@ -117,7 +117,12 @@ export default function CadastrarProdutor() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde,paddingBottom: RFValue(30) }}>
-      <HeaderTitle texto='Cadastrar Produtor' voltar='true' home='true' />
+      {id_produtor &&
+        <HeaderTitle texto='Editar Produtor' voltar='true' home='true' />
+      }
+      {!id_produtor &&
+        <HeaderTitle texto='Cadastrar Produtor' voltar='true' home='true' />
+      }
       <ViewCenter>
         <Label
           label='Nome'

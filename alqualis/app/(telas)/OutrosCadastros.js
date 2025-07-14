@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Alert } from 'react-native';
 import HeaderTitle from '../../components/personalizados/headerTtitle';
 import Cores from '../../constants/Cores';
@@ -6,14 +6,29 @@ import Botao from '../../components/personalizados/Botao';
 import ViewCenter from '../../components/personalizados/ViewCenter';
 import Label from '../../components/personalizados/Label';
 import { useLocalSearchParams } from 'expo-router';
-import { inserirGenerico } from '../../database/database';
+import {
+  inserirGenerico,
+  buscarRegistroGenericoPorId,
+  atualizarGenerico
+} from '../../database/database';
+
+// 🔹 Função utilitária para mapear id → nome da tabela
+const getNomeTabelaPorId = (id) => {
+  const map = {
+    '1': 'cooperativa',
+    '2': 'municipio',
+    '3': 'comunidade',
+    '4': 'face_exposicao',
+    '5': 'variedade',
+  };
+  return map[id] || null;
+};
 
 export default function OutrosCadastros() {
-  const { label, id } = useLocalSearchParams();
+  const { label, id, id_cadastro, titulo } = useLocalSearchParams();
   const [nome, setNome] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  // Map de ID → tabela, campo e mensagem de sucesso
   const cadastroMap = {
     '1': {
       table: 'cooperativa',
@@ -42,6 +57,26 @@ export default function OutrosCadastros() {
     },
   };
 
+  const config = cadastroMap[id];
+
+  // 🔸 Carrega dados se for edição
+  useEffect(() => {
+    const carregarDados = async () => {
+      if (!id_cadastro || !config) return;
+
+      const nomeTabela = getNomeTabelaPorId(id);
+      if (!nomeTabela) return;
+
+      const registro = await buscarRegistroGenericoPorId(nomeTabela, Number(id_cadastro));
+      console.log(registro)
+      if (registro && config.field) {
+        setNome(registro[config.field] || '');
+      }
+    };
+
+    carregarDados();
+  }, [id, id_cadastro]);
+
   const handleSalvar = async () => {
     setFormSubmitted(true);
 
@@ -50,7 +85,6 @@ export default function OutrosCadastros() {
       return;
     }
 
-    const config = cadastroMap[id];
     if (!config) {
       Alert.alert('Erro', 'Tipo de cadastro inválido.');
       return;
@@ -74,11 +108,48 @@ export default function OutrosCadastros() {
     }
   };
 
-  const config = cadastroMap[id];
+  const handleAtualizar = async () => {
+  setFormSubmitted(true);
+
+  if (!nome.trim()) {
+    Alert.alert('Atenção!', 'O nome não pode estar vazio.');
+    return;
+  }
+
+  if (!config || !id_cadastro) {
+    Alert.alert('Erro', 'Informações de edição inválidas.');
+    return;
+  }
+
+  try {
+    const sucesso = await atualizarGenerico(
+      config.table,
+      config.field,
+      nome.toUpperCase(),
+      Number(id_cadastro),
+      `${titulo} atualizado com sucesso!`
+    );
+
+    if (sucesso) {
+      console.log(`✅ ${titulo} atualizado(a) com ID: ${id_cadastro}`);
+      setFormSubmitted(false);
+    }
+
+  } catch (error) {
+    console.error(`❌ Erro ao atualizar ${titulo}:`, error);
+    Alert.alert('Erro', `Não foi possível atualizar ${titulo}.`);
+  }
+};
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde }}>
+      {titulo &&
+      <HeaderTitle texto={`Editar ${titulo}`} voltar="true" home="true" />
+      }
+       {!titulo &&
       <HeaderTitle texto={`Cadastrar ${label}`} voltar="true" home="true" />
+      }     
       <ViewCenter>
         <Label
           label="Nome"
@@ -94,7 +165,16 @@ export default function OutrosCadastros() {
           mensagemDuplicadoPersonalizada={`Já existe um(a) ${label?.toLowerCase()} com esse nome.`}
         />
       </ViewCenter>
-      <Botao texto="Salvar" onPress={handleSalvar} />
+      {!id_cadastro &&
+        <Botao texto='Salvar' onPress={handleSalvar} /> 
+      }     
+      
+      {id_cadastro &&
+      <>
+        <Botao texto='Editar' onPress={handleAtualizar} cor={Cores.azul} foto = 'create-outline'/> 
+        <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
+      </>
+      }  
     </View>
   );
 }

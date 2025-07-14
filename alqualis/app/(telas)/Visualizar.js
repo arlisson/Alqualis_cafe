@@ -116,7 +116,7 @@ export default function Visualizar() {
 
       default:
         router.push({pathname:'(telas)/OutrosCadastros',
-          params:{id_cadastro:row[0].value, id}
+          params:{id_cadastro:row[0].value, id:id-2, titulo}
         })
       break;
     }

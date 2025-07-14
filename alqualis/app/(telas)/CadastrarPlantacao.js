@@ -217,7 +217,12 @@ export default function CadastrarPlantacao() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom: RFValue(30) }}>
-      <HeaderTitle texto='Cadastrar Plantação' voltar='true' home='true' />
+      {id_plantacao &&
+       <HeaderTitle texto='Editar Plantação' voltar='true' home='true' />
+      }
+      {!id_plantacao &&
+       <HeaderTitle texto='Cadastrar Plantação' voltar='true' home='true' />
+      }
       <ViewCenter>
         <Label
           label='Nome da propriedade'

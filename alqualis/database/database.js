@@ -289,6 +289,28 @@ export const buscarRegistrosGenericos = async (nomeTabela) => {
 };
 
 /**
+ * @description Busca um único registro de uma tabela pelo ID
+ * @param {string} nomeTabela - Nome da tabela (ex: 'produtor')
+ * @param {number} id - ID do registro a ser buscado
+ * @returns {Promise<Object|null>} Objeto com os dados ou null se não encontrado
+ */
+export const buscarRegistroGenericoPorId = async (nomeTabela, id) => {
+  const database = await openDatabase();
+  try {
+    const row = await database.getFirstAsync(
+      `SELECT * FROM ${nomeTabela} WHERE id_${nomeTabela} = ?;`,
+      [id]
+    );
+    return row || null;
+  } catch (error) {
+    console.error(`❌ Erro ao buscar registro em ${nomeTabela} por ID:`, error);
+    Alert.alert("Erro", `Não foi possível buscar o registro de ${nomeTabela}.`);
+    return null;
+  }
+};
+
+
+/**
  * @description Insere um registro genérico em qualquer tabela
  * @param {string} table - Nome da tabela (ex: 'cooperativa')
  * @param {Object} data   - Objeto com um único par { coluna: valor }
@@ -333,6 +355,49 @@ export const inserirGenerico = async (table, data, successMessage) => {
     return null;
   }
 };
+
+/**
+ * @description Atualiza um registro genérico em qualquer tabela
+ * @param {string} table - Nome da tabela (ex: 'cooperativa')
+ * @param {string} column - Nome da coluna (ex: 'nome_cooperativa')
+ * @param {string|number} value - Novo valor
+ * @param {number} id - ID do registro que será atualizado
+ * @param {string} successMessage - Texto de sucesso no Alert
+ * @returns {Promise<boolean>} true se sucesso, false caso erro
+ */
+export const atualizarGenerico = async (table, column, value, id, successMessage) => {
+  const valor = value?.toString().trim();
+  if (!valor) {
+    Alert.alert("Erro", `O campo ${column} é obrigatório.`);
+    return false;
+  }
+
+  const db = await openDatabase();
+
+  try {
+    // Verifica se já existe outro com o mesmo nome
+    const checkSql = `SELECT 1 FROM ${table} WHERE ${column} = ? AND id_${table} != ? LIMIT 1;`;
+    const existente = await db.getFirstAsync(checkSql, [valor, id]);
+
+    if (existente) {
+      Alert.alert("Aviso", `Já existe um registro com o valor "${valor}" em ${table}.`);
+      return false;
+    }
+
+    // Atualização
+    const updateSql = `UPDATE ${table} SET ${column} = ? WHERE id_${table} = ?;`;
+    await db.runAsync(updateSql, [valor, id]);
+
+    Alert.alert("Sucesso", successMessage);
+    return true;
+
+  } catch (error) {
+    console.error(`❌ Erro ao atualizar ${table}:`, error);
+    Alert.alert("Erro", `Erro ao atualizar em ${table}.`);
+    return false;
+  }
+};
+
 
 
 /**
