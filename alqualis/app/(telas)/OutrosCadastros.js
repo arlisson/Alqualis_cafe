@@ -35,6 +35,11 @@ export default function OutrosCadastros() {
       field: 'nome_face_exposicao',
       success: 'Face de exposição cadastrada com sucesso!',
     },
+    '5': {
+      table: 'variedade',
+      field: 'nome_variedade',
+      success: 'Variedade cadastrada com sucesso!',
+    },
   };
 
   const handleSalvar = async () => {

@@ -123,11 +123,11 @@ export default function CadastrarPlantacao() {
         id_variedade: parseInt(variedade.value, 10),
         id_comunidade: parseInt(comunidade.value, 10),
         id_municipio: parseInt(municipio.value, 10),
-        nome_plantacao: nomePropriedade,
+        nome_plantacao: nomePropriedade.toUpperCase(),
         latitude,
         longitude,
         altitude_media: altitude,
-        nome_talhao: nomeTalhao,
+        nome_talhao: nomeTalhao.toUpperCase(),
         faces: facesIds,
       });
 

@@ -511,3 +511,45 @@ export const inserirPlantacao = async ({
     return null;
   }
 };
+/**
+ * 
+ * @param {*} tabela 
+ * @param {*} termoBusca 
+ * @returns Retorna a busca feita no filtro
+ */
+export const buscarRegistrosComFiltro = async (tabela, termoBusca) => {
+  const db = await openDatabase();
+
+  try {
+    // 1. Tenta identificar colunas de texto via PRAGMA
+    const colunasInfo = await db.getAllAsync(`PRAGMA table_info(${tabela});`);
+    let colunasTexto = colunasInfo
+      .filter(col =>
+        col.type?.toUpperCase().includes('CHAR') || col.type?.toUpperCase().includes('TEXT')
+      )
+      .map(col => col.name);
+
+    // 2. Fallback: se nada for identificado, tenta a coluna que começa com "nome_"
+    if (colunasTexto.length === 0) {
+      colunasTexto = colunasInfo
+        .filter(col => col.name?.toLowerCase().startsWith('nome_'))
+        .map(col => col.name);
+    }
+
+    // 3. Se ainda assim não achou nada, retorna []
+    if (colunasTexto.length === 0) return [];
+
+    // 4. Monta a cláusula WHERE
+    const whereClause = colunasTexto.map(col => `${col} LIKE ?`).join(' OR ');
+    const params = colunasTexto.map(() => `%${termoBusca}%`);
+    const sql = `SELECT * FROM ${tabela} WHERE ${whereClause};`;
+
+    const resultados = await db.getAllAsync(sql, params);
+    return resultados;
+
+  } catch (error) {
+    console.error(`Erro ao buscar com filtro na tabela ${tabela}:`, error);
+    return [];
+  }
+};
+

@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-} from 'react-native';
+import React, { useState, useEffect, useDeferredValue } from 'react';
+import { View } from 'react-native';
 import HeaderTitle from '../../components/personalizados/headerTtitle';
 import Cores from '../../constants/Cores';
 import ViewCenter from '../../components/personalizados/ViewCenter';
@@ -10,24 +8,27 @@ import { useLocalSearchParams } from 'expo-router';
 import Tabela from '../../components/personalizados/Tabela';
 import {
   buscarRegistrosGenericos,
+  buscarRegistrosComFiltro,
   buscarProdutoresCooperativa,
-  buscarPlantacoesDetalhadas, // import da nova função
+  buscarPlantacoesDetalhadas,
 } from '../../database/database';
 
 export default function Visualizar() {
   const { titulo, id } = useLocalSearchParams();
   const tabelas = {
     1: 'produtor',
-    // 2: plantacao  ← agora trataremos separadamente
+    2: 'plantacao',
     3: 'cooperativa',
     4: 'municipio',
     5: 'comunidade',
     6: 'face_exposicao',
+    7:'variedade',
   };
 
   const [header, setHeader] = useState([]);
-  const [data, setData]     = useState([]);
-  const [busca, setBusca]   = useState('');
+  const [data, setData] = useState([]);
+  const [busca, setBusca] = useState('');
+  const buscaAdiada = useDeferredValue(busca);
 
   const formatHeader = (col) => {
     if (col === 'id') return 'Id';
@@ -40,61 +41,61 @@ export default function Visualizar() {
 
   const carregarDados = async () => {
     const tipo = parseInt(id, 10);
+    const termoBusca = buscaAdiada.trim().toLowerCase();
+
+    let registros = [];
 
     if (tipo === 1) {
-      // PRODUTOR + cooperativa, já existente
-      let regs = await buscarProdutoresCooperativa();
-      regs = regs.map(item => ({
+      registros = await buscarProdutoresCooperativa();
+      registros = registros.map((item) => ({
         ...item,
-        cooperativa:
-          item.cooperativa && item.cooperativa.trim() !== ''
-            ? item.cooperativa
-            : 'Não participa',
-        cpf_produtor:
-          item.cpf_produtor && item.cpf_produtor.trim() !== ''
-            ? item.cpf_produtor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
-            : 'Não informado',
+        cooperativa: item.cooperativa?.trim() || 'Não participa',
+        cpf_produtor: item.cpf_produtor
+          ? item.cpf_produtor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+          : 'Não informado',
       }));
-      if (regs.length) {
-        const cols = Object.keys(regs[0]);
-        setHeader(cols.map(formatHeader));
-        setData(regs.map(r => cols.map(c => (r[c] ?? '').toString())));
-      } else {
-        setHeader([]);
-        setData([]);
+
+      if (termoBusca) {
+        registros = registros.filter((r) =>
+          Object.values(r).some((val) =>
+            val?.toString().toLowerCase().includes(termoBusca)
+          )
+        );
       }
 
     } else if (tipo === 2) {
-      // PLANTAÇÃO detalhada: usa GROUP_CONCAT de faces etc.
-      const regs = await buscarPlantacoesDetalhadas();
-      if (regs.length) {
-        const cols = Object.keys(regs[0]);
-        setHeader(cols.map(formatHeader));
-        setData(regs.map(r => cols.map(c => (r[c] ?? '').toString())));
-      } else {
-        setHeader([]);
-        setData([]);
+      registros = await buscarPlantacoesDetalhadas();
+
+      if (termoBusca) {
+        registros = registros.filter((r) =>
+          Object.values(r).some((val) =>
+            val?.toString().toLowerCase().includes(termoBusca)
+          )
+        );
       }
 
     } else {
-      // demais tabelas genéricas
       const nomeTabela = tabelas[tipo];
       if (!nomeTabela) return;
-      const regs = await buscarRegistrosGenericos(nomeTabela);
-      if (regs.length) {
-        const cols = Object.keys(regs[0]);
-        setHeader(cols.map(formatHeader));
-        setData(regs.map(r => cols.map(c => (r[c] ?? '').toString())));
-      } else {
-        setHeader([]);
-        setData([]);
-      }
+
+      registros = termoBusca
+        ? await buscarRegistrosComFiltro(nomeTabela, termoBusca)
+        : await buscarRegistrosGenericos(nomeTabela);
+    }
+
+    if (registros.length) {
+      const colunas = Object.keys(registros[0]);
+      setHeader(colunas.map(formatHeader));
+      setData(registros.map(r => colunas.map(c => (r[c] ?? '').toString())));
+    } else {
+      setHeader([]);
+      setData([]);
     }
   };
 
   useEffect(() => {
     carregarDados();
-  }, [id]);
+  }, [id, buscaAdiada]);
 
   const handlePress = (row) => {
     console.log('--- Registro selecionado ---');
@@ -117,7 +118,7 @@ export default function Visualizar() {
           header={header}
           data={data}
           onRowPress={handlePress}
-          hiddenColumns={[0]}  // esconde o ID
+          hiddenColumns={[0]} // esconde o ID
         />
       </ViewCenter>
     </View>

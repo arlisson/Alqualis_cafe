@@ -69,6 +69,14 @@ export default function Index() {
         <Botao texto='Visualizar Face de Exposição' foto='eye-outline'  onPress={() => router.push({
           pathname:'(telas)/Visualizar',
           params:{titulo:'Face de Exposição', id:'6'}})}/>
+
+          <Botao texto='Cadastrar Variedade' foto='eyedrop-outline'onPress={() => router.push({
+          pathname:'(telas)/OutrosCadastros',
+          params:{label:'Variedade',id:'5'}})}/>
+        <Botao texto='Visualizar Variedade' foto='eye-outline'  onPress={() => router.push({
+          pathname:'(telas)/Visualizar',
+          params:{titulo:'Variedade', id:'7'}})}/>
+
         <Botao texto='Criar Banco' cor='blue' onPress={()=>handleCriarBanco()} />
         <Botao texto='Apagar Banco' cor='red' onPress={() => deleteDatabase()} />
       </ViewCenter>
