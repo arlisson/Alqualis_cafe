@@ -31,69 +31,18 @@ export default function Index() {
     <View style={{flex: 1, backgroundColor:Cores.verde }}>
       <HeaderTitle texto='Gestão do Café' />
       <ViewCenter>
-        <Botao texto='Cadastrar Produtor' foto='person-add-outline'
+         <Botao texto='Gestão do Produtor' foto='person-outline'
           cor={Cores.marrom}
-          onPress={() => router.push('(telas)/CadastrarProdutor')}
-        />
-        <Botao texto='Visualizar Produtor' foto='eye-outline'
-          cor={Cores.marrom}
-          onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Produtor', id: '1' } })}
-        />
-
-        <Botao texto='Cadastrar Plantação' foto='leaf-outline'
+          onPress={() => router.push({pathname:'(telas)/TelaInicial',params:{produtor:true, titulo:'Gestão do Produtor'}})}
+          />
+          <Botao texto='Gestão da Plantação' foto='leaf-outline'
           cor={Cores.azul}
-          onPress={() => router.push('(telas)/CadastrarPlantacao')}
-        />
-        <Botao texto='Visualizar Plantação' foto='eye-outline'
-          cor={Cores.azul}
-          onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Plantação', id: '2' } })}
-        />
-
-        <Botao texto='Cadastrar Cooperativa' foto='storefront-outline'
-          cor={Cores.caramelo}
-          onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Cooperativa', id: '1' } })}
-        />
-        <Botao texto='Visualizar Cooperativas' foto='eye-outline'
-          cor={Cores.caramelo}
-          onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Cooperativa', id: '3' } })}
-        />
-
-        <Botao texto='Cadastrar Município' foto='business-outline'
-          cor={Cores.verdeMusgo}
-          onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Município', id: '2' } })}
-        />
-        <Botao texto='Visualizar Município' foto='eye-outline'
-          cor={Cores.verdeMusgo}
-          onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Município', id: '4' } })}
-        />
-
-        <Botao texto='Cadastrar Comunidade' foto='people-outline'
-          cor={Cores.terracota}
-          onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Comunidade', id: '3' } })}
-        />
-        <Botao texto='Visualizar Comunidades' foto='eye-outline'
-          cor={Cores.terracota}
-          onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Comunidade', id: '5' } })}
-        />
-
-        <Botao texto='Cadastrar Face de Exposição' foto='sunny-outline'
+          onPress={() => router.push({pathname:'(telas)/TelaInicial',params:{plantacao:true, titulo:'Gestão da Plantação'}})}
+          />
+          <Botao texto='Outras Gestões' foto='file-tray-stacked-outline'
           cor={Cores.oliva}
-          onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Face de Exposição', id: '4' } })}
-        />
-        <Botao texto='Visualizar Face de Exposição' foto='eye-outline'
-          cor={Cores.oliva}
-          onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Face de Exposição', id: '6' } })}
-        />
-
-        <Botao texto='Cadastrar Variedade' foto='eyedrop-outline'
-          cor={Cores.vinho}
-          onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Variedade', id: '5' } })}
-        />
-        <Botao texto='Visualizar Variedade' foto='eye-outline'
-          cor={Cores.vinho}
-          onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Variedade', id: '7' } })}
-        />
-
+          onPress={() => router.push({pathname:'(telas)/TelaInicial',params:{outros:true, titulo:'Outras Gestões'}})}
+          />
 
         <Botao texto='Criar Banco' cor={Cores.azul} onPress={()=>handleCriarBanco()} />
         <Botao texto='Apagar Banco' cor={Cores.vermelho} onPress={() => deleteDatabase()} foto='trash-outline'/>

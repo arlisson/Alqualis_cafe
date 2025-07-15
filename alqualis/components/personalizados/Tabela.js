@@ -16,6 +16,7 @@ export default function Tabela({
   columnWidth = RFValue(100),
   onRowPress = () => {},
   hiddenColumns = [],
+  headerColor=Cores.marrom
 }) {
   const visibleIndices = header
     .map((_, index) => index)
@@ -37,7 +38,7 @@ export default function Tabela({
             {/* Cabeçalho */}
             <Row
               data={filteredHeader}
-              style={styles.head}
+              style={[styles.head,{backgroundColor:headerColor}]}
               textStyle={styles.textHead}
               widthArr={visibleIndices.map(() => columnWidth)}
             />
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
   },
   head: {
     height: RFValue(40),
-    backgroundColor: Cores.marrom,
+    
   },
   textHead: {
     textAlign: 'center',

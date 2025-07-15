@@ -16,7 +16,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 
 export default function Visualizar() {
-  const { titulo, id } = useLocalSearchParams();
+  const { titulo, id, cor } = useLocalSearchParams();
   const tabelas = {
     1: 'produtor',
     2: 'plantacao',
@@ -144,6 +144,7 @@ export default function Visualizar() {
           data={data}
           onRowPress={handlePress}
           hiddenColumns={[0]} // esconde o ID
+          headerColor={cor}
         />
       </ViewCenter>
     </View>
