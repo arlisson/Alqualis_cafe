@@ -43,81 +43,73 @@ export const createDatabase = async (mensagem = true) => {
     await database.execAsync(`
       PRAGMA foreign_keys = ON;
 
-      -- -----------------------------------------------------
       -- Tabela produtor
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS produtor (
-        id_produtor        INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_produtor      TEXT    NOT NULL,
-        cpf_produtor       TEXT    UNIQUE,
-        codigo_produtor    TEXT    UNIQUE
+        id_produtor        INTEGER PRIMARY KEY,
+        nome_produtor      TEXT NOT NULL,
+        cpf_produtor       TEXT,
+        codigo_produtor    TEXT,
+        UNIQUE (cpf_produtor),
+        UNIQUE (codigo_produtor)
       );
 
-      -- -----------------------------------------------------
       -- Tabela comunidade
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS comunidade (
         id_comunidade      INTEGER PRIMARY KEY,
-        nome_comunidade    TEXT    UNIQUE
+        nome_comunidade    TEXT,
+        UNIQUE (nome_comunidade)
       );
 
-      -- -----------------------------------------------------
       -- Tabela municipio
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS municipio (
         id_municipio       INTEGER PRIMARY KEY,
-        nome_municipio     TEXT    UNIQUE
+        nome_municipio     TEXT,
+        UNIQUE (nome_municipio)
       );
 
-      -- -----------------------------------------------------
       -- Tabela cooperativa
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS cooperativa (
-        id_cooperativa     INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_cooperativa   TEXT    UNIQUE
+        id_cooperativa     INTEGER PRIMARY KEY,
+        nome_cooperativa   TEXT,
+        UNIQUE (nome_cooperativa)
       );
 
-      -- -----------------------------------------------------
       -- Tabela variedade
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS variedade (
-        id_variedade       INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_variedade     TEXT    UNIQUE
+        id_variedade       INTEGER PRIMARY KEY,
+        nome_variedade     TEXT,
+        UNIQUE (nome_variedade)
       );
 
-      -- -----------------------------------------------------
       -- Tabela plantacao
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS plantacao (
-        id_plantacao       INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_produtor        INTEGER NOT NULL,
-        id_variedade       INTEGER NOT NULL,
-        id_comunidade      INTEGER NOT NULL,
-        id_municipio       INTEGER NOT NULL,
-        nome_plantacao     TEXT    NOT NULL,
-        latitude           TEXT,
-        longitude          TEXT,
-        altitude_media     TEXT,
-        nome_talhao        TEXT,
-        meses_colheita     TEXT, 
-        -- removemos o campo 'face_exposicao' aqui porque agora teremos tabela de junção
-        FOREIGN KEY (id_produtor)       REFERENCES produtor(id_produtor),
-        FOREIGN KEY (id_variedade)      REFERENCES variedade(id_variedade),
-        FOREIGN KEY (id_comunidade)     REFERENCES comunidade(id_comunidade),
-        FOREIGN KEY (id_municipio)      REFERENCES municipio(id_municipio)
+        id_plantacao     INTEGER PRIMARY KEY,
+        id_produtor      INTEGER NOT NULL,
+        id_variedade     INTEGER NOT NULL,
+        id_comunidade    INTEGER NOT NULL,
+        id_municipio     INTEGER NOT NULL,
+        nome_plantacao   TEXT NOT NULL,
+        latitude         TEXT,
+        longitude        TEXT,
+        altitude_media   TEXT,
+        nome_talhao      TEXT,
+        face_exposicao   TEXT,
+        meses_colheita   TEXT,
+        FOREIGN KEY (id_produtor)    REFERENCES produtor(id_produtor),
+        FOREIGN KEY (id_variedade)   REFERENCES variedade(id_variedade),
+        FOREIGN KEY (id_comunidade)  REFERENCES comunidade(id_comunidade),
+        FOREIGN KEY (id_municipio)   REFERENCES municipio(id_municipio)
       );
 
-      -- Índices adicionais para acelerar buscas
+      -- Índices auxiliares
       CREATE INDEX IF NOT EXISTS idx_plantacao_produtor   ON plantacao(id_produtor);
       CREATE INDEX IF NOT EXISTS idx_plantacao_variedade  ON plantacao(id_variedade);
       CREATE INDEX IF NOT EXISTS idx_plantacao_comunidade ON plantacao(id_comunidade);
       CREATE INDEX IF NOT EXISTS idx_plantacao_municipio  ON plantacao(id_municipio);
 
-      -- -----------------------------------------------------
       -- Tabela cooperativa_produtor
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS cooperativa_produtor (
-        id_cooperativa_produtor INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_cooperativa_produtor INTEGER PRIMARY KEY,
         id_cooperativa          INTEGER NOT NULL,
         id_produtor             INTEGER NOT NULL,
         FOREIGN KEY (id_cooperativa) REFERENCES cooperativa(id_cooperativa),
@@ -125,30 +117,46 @@ export const createDatabase = async (mensagem = true) => {
       );
 
       CREATE INDEX IF NOT EXISTS idx_cp_cooperativa ON cooperativa_produtor(id_cooperativa);
-      CREATE INDEX IF NOT EXISTS idx_cp_produtor     ON cooperativa_produtor(id_produtor);
+      CREATE INDEX IF NOT EXISTS idx_cp_produtor    ON cooperativa_produtor(id_produtor);
 
-      -- -----------------------------------------------------
       -- Tabela face_exposicao
-      -- -----------------------------------------------------
       CREATE TABLE IF NOT EXISTS face_exposicao (
-        id_face_exposicao   INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_face_exposicao TEXT    UNIQUE
+        id_face_exposicao     INTEGER PRIMARY KEY,
+        nome_face_exposicao   TEXT,
+        UNIQUE (nome_face_exposicao)
       );
 
-      -- -----------------------------------------------------
-      -- Tabela de junção plantacao ↔ face_exposicao
-      -- -----------------------------------------------------
+      -- Tabela de junção face_exposicao_plantacao
       CREATE TABLE IF NOT EXISTS face_exposicao_plantacao (
-        id_face_exposicao_plantacao INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_face_exposicao_plantacao INTEGER PRIMARY KEY,
         id_face_exposicao           INTEGER,
         id_plantacao                INTEGER,
         FOREIGN KEY (id_face_exposicao) REFERENCES face_exposicao(id_face_exposicao),
         FOREIGN KEY (id_plantacao)      REFERENCES plantacao(id_plantacao)
       );
 
-      CREATE INDEX IF NOT EXISTS idx_fep_face       ON face_exposicao_plantacao(id_face_exposicao);
-      CREATE INDEX IF NOT EXISTS idx_fep_plantacao  ON face_exposicao_plantacao(id_plantacao);     
-      
+      CREATE INDEX IF NOT EXISTS idx_fep_face      ON face_exposicao_plantacao(id_face_exposicao);
+      CREATE INDEX IF NOT EXISTS idx_fep_plantacao ON face_exposicao_plantacao(id_plantacao);
+   
+      INSERT INTO cooperativa (nome_cooperativa) VALUES ('COOPAGRI');
+      INSERT INTO cooperativa (nome_cooperativa) VALUES ('AGROVALE');
+      INSERT INTO cooperativa (nome_cooperativa) VALUES ('COOPCAFÉ');
+
+      INSERT INTO municipio (nome_municipio) VALUES ('Lavras');
+      INSERT INTO municipio (nome_municipio) VALUES ('Patrocínio');
+      INSERT INTO municipio (nome_municipio) VALUES ('Manhuaçu');
+
+      INSERT INTO comunidade (nome_comunidade) VALUES ('Santa Rosa');
+      INSERT INTO comunidade (nome_comunidade) VALUES ('Boa Esperança');
+      INSERT INTO comunidade (nome_comunidade) VALUES ('Monte Verde');
+
+      INSERT INTO face_exposicao (nome_face_exposicao) VALUES ('Norte');
+      INSERT INTO face_exposicao (nome_face_exposicao) VALUES ('Sul');
+      INSERT INTO face_exposicao (nome_face_exposicao) VALUES ('Leste');
+
+      INSERT INTO variedade (nome_variedade) VALUES ('Catuaí Amarelo');
+      INSERT INTO variedade (nome_variedade) VALUES ('Bourbon Vermelho');
+      INSERT INTO variedade (nome_variedade) VALUES ('Mundo Novo');
 
     `);
 
@@ -269,6 +277,88 @@ export const associarProdutorCooperativa = async ({
     return false;
   }
 };
+
+/**
+ * @description Atualiza um produtor e sua associação com cooperativa
+ * @param {*} id_produtor
+ * @param {*} nome_produtor
+ * @param {*} cpf_produtor
+ * @param {*} codigo_produtor
+ * @param {*} id_cooperativa
+ * @returns {boolean} true se sucesso, false se erro
+ */
+export const atualizarProdutor = async ({
+  id_produtor,
+  nome_produtor,
+  cpf_produtor = "",
+  codigo_produtor = null,
+  id_cooperativa = null,
+}) => {
+  if (!id_produtor || !nome_produtor) {
+    Alert.alert("Erro", "ID e nome do produtor são obrigatórios.");
+    return false;
+  }
+
+  const database = await openDatabase();
+
+  try {
+    // 🔍 Verifica se CPF já existe para outro produtor
+    if (cpf_produtor) {
+      const cpfDuplicado = await database.getFirstAsync(
+        `SELECT 1 FROM produtor WHERE cpf_produtor = ? AND id_produtor != ? LIMIT 1;`,
+        [cpf_produtor, id_produtor]
+      );
+      if (cpfDuplicado) {
+        Alert.alert("Erro", "Este CPF já está cadastrado para outro produtor.");
+        return false;
+      }
+    }
+
+    // 🔍 Verifica se Código já existe para outro produtor
+    if (codigo_produtor) {
+      const codigoDuplicado = await database.getFirstAsync(
+        `SELECT 1 FROM produtor WHERE codigo_produtor = ? AND id_produtor != ? LIMIT 1;`,
+        [codigo_produtor, id_produtor]
+      );
+      if (codigoDuplicado) {
+        Alert.alert("Erro", "Este código já está cadastrado para outro produtor.");
+        return false;
+      }
+    }
+
+    // ✅ Atualiza dados do produtor
+    await database.runAsync(
+      `UPDATE produtor
+       SET nome_produtor = ?, cpf_produtor = ?, codigo_produtor = ?
+       WHERE id_produtor = ?;`,
+      [nome_produtor, cpf_produtor, codigo_produtor, id_produtor]
+    );
+
+    // 🔄 Remove associação anterior
+    await database.runAsync(
+      `DELETE FROM cooperativa_produtor WHERE id_produtor = ?;`,
+      [id_produtor]
+    );
+
+    // 🔗 Reassocia cooperativa (se fornecida)
+    if (id_cooperativa) {
+      await database.runAsync(
+        `INSERT INTO cooperativa_produtor (id_cooperativa, id_produtor)
+         VALUES (?, ?);`,
+        [id_cooperativa, id_produtor]
+      );
+    }
+
+    Alert.alert("Sucesso", "Produtor atualizado com sucesso!");
+    return true;
+
+  } catch (error) {
+    console.error("❌ Erro ao atualizar produtor:", error);
+    Alert.alert("Erro", "Erro ao atualizar o produtor.");
+    return false;
+  }
+};
+
 
 /**
  * @description Busca todos os registros de uma tabela
@@ -667,6 +757,107 @@ export const inserirPlantacao = async ({
   }
 };
 
+/**
+ * Atualiza uma plantação existente e suas associações de face de exposição.
+ *
+ * @param {Object} plantacao
+ * @param {number} plantacao.id_plantacao
+ * @param {number} plantacao.id_produtor
+ * @param {number} plantacao.id_variedade
+ * @param {number} plantacao.id_comunidade
+ * @param {number} plantacao.id_municipio
+ * @param {string} plantacao.nome_plantacao
+ * @param {string} [plantacao.latitude]
+ * @param {string} [plantacao.longitude]
+ * @param {string} [plantacao.altitude_media]
+ * @param {string} [plantacao.nome_talhao]
+ * @param {number[]} plantacao.faces Array de IDs de face_exposicao
+ * @param {string[]} [plantacao.meses_colheita]
+ * @returns {Promise<boolean>} true se sucesso, false se erro
+ */
+export const atualizarPlantacao = async ({
+  id_plantacao,
+  id_produtor,
+  id_variedade,
+  id_comunidade,
+  id_municipio,
+  nome_plantacao,
+  latitude = null,
+  longitude = null,
+  altitude_media = null,
+  nome_talhao = null,
+  faces = [],
+  meses_colheita = null
+}) => {
+  const db = await openDatabase();
+
+  if (
+    !id_plantacao || !id_produtor || !id_variedade || !id_comunidade ||
+    !id_municipio || !nome_plantacao
+  ) {
+    Alert.alert('Erro', 'Campos obrigatórios não informados.');
+    return false;
+  }
+
+  try {
+    await db.execAsync('BEGIN TRANSACTION;');
+
+    // Atualiza a plantação
+    await db.runAsync(
+      `UPDATE plantacao SET
+        id_produtor = ?,
+        id_variedade = ?,
+        id_comunidade = ?,
+        id_municipio = ?,
+        nome_plantacao = ?,
+        latitude = ?,
+        longitude = ?,
+        altitude_media = ?,
+        nome_talhao = ?,
+        meses_colheita = ?
+      WHERE id_plantacao = ?;`,
+      [
+        id_produtor,
+        id_variedade,
+        id_comunidade,
+        id_municipio,
+        nome_plantacao,
+        latitude,
+        longitude,
+        altitude_media,
+        nome_talhao,
+        JSON.stringify(meses_colheita),
+        id_plantacao
+      ]
+    );
+
+    // Remove faces antigas
+    await db.runAsync(
+      `DELETE FROM face_exposicao_plantacao WHERE id_plantacao = ?;`,
+      [id_plantacao]
+    );
+
+    // Insere novas faces
+    for (const id_face of faces) {
+      await db.runAsync(
+        `INSERT INTO face_exposicao_plantacao (id_face_exposicao, id_plantacao)
+         VALUES (?, ?);`,
+        [id_face, id_plantacao]
+      );
+    }
+
+    await db.execAsync('COMMIT;');
+    Alert.alert('Sucesso', 'Plantação atualizada com sucesso!');
+    return true;
+
+  } catch (error) {
+    try { await db.execAsync('ROLLBACK;'); } catch (_) {}
+    console.error('❌ Erro ao atualizar plantação:', error);
+    Alert.alert('Erro', 'Não foi possível atualizar a plantação.');
+    return false;
+  }
+};
+
 
 /**
  * 
@@ -707,6 +898,134 @@ export const buscarRegistrosComFiltro = async (tabela, termoBusca) => {
   } catch (error) {
     console.error(`Erro ao buscar com filtro na tabela ${tabela}:`, error);
     return [];
+  }
+};
+
+///////////////////////// EXCLUIR ///////////////////////////////////////////////
+
+export const excluirPlantacao = async (id_plantacao) => {
+  const db = await openDatabase();
+  try {
+    await db.execAsync('BEGIN TRANSACTION;');
+
+    // Remove associações com faces de exposição
+    await db.runAsync(
+      `DELETE FROM face_exposicao_plantacao WHERE id_plantacao = ?;`,
+      [id_plantacao]
+    );
+
+    // Remove a plantação
+    await db.runAsync(
+      `DELETE FROM plantacao WHERE id_plantacao = ?;`,
+      [id_plantacao]
+    );
+
+    await db.execAsync('COMMIT;');
+    Alert.alert('Sucesso', 'Plantação excluída com sucesso!');
+    return true;
+  } catch (error) {
+    try { await db.execAsync('ROLLBACK;'); } catch (_) {}
+    console.error('❌ Erro ao excluir plantação:', error);
+    Alert.alert('Erro', 'Erro ao excluir a plantação.');
+    return false;
+  }
+};
+
+export const excluirProdutor = async (id_produtor) => {
+  const db = await openDatabase();
+  try {
+    await db.execAsync('BEGIN TRANSACTION;');
+
+    // Verifica se há plantações associadas
+    const plantaExistente = await db.getFirstAsync(
+      `SELECT 1 FROM plantacao WHERE id_produtor = ? LIMIT 1;`,
+      [id_produtor]
+    );
+    if (plantaExistente) {
+      Alert.alert('Aviso', 'Este produtor está vinculado a plantações e não pode ser excluído.');
+      await db.execAsync('ROLLBACK;');
+      return false;
+    }
+
+    // Remove associação com cooperativa (se houver)
+    await db.runAsync(
+      `DELETE FROM cooperativa_produtor WHERE id_produtor = ?;`,
+      [id_produtor]
+    );
+
+    // Remove o produtor
+    await db.runAsync(
+      `DELETE FROM produtor WHERE id_produtor = ?;`,
+      [id_produtor]
+    );
+
+    await db.execAsync('COMMIT;');
+    Alert.alert('Sucesso', 'Produtor excluído com sucesso!');
+    return true;
+  } catch (error) {
+    try { await db.execAsync('ROLLBACK;'); } catch (_) {}
+    console.error('❌ Erro ao excluir produtor:', error);
+    Alert.alert('Erro', 'Erro ao excluir o produtor.');
+    return false;
+  }
+};
+
+
+export const excluirGenerico = async (tabela, id) => {
+  const db = await openDatabase();
+
+  const idColumnMap = {
+    cooperativa: 'id_cooperativa',
+    municipio: 'id_municipio',
+    comunidade: 'id_comunidade',
+    face_exposicao: 'id_face_exposicao',
+    variedade: 'id_variedade',
+  };
+
+  const dependenciasMap = {
+    cooperativa: { tabela: 'cooperativa_produtor', coluna: 'id_cooperativa' },
+    municipio: { tabela: 'plantacao', coluna: 'id_municipio' },
+    comunidade: { tabela: 'plantacao', coluna: 'id_comunidade' },
+    face_exposicao: { tabela: 'face_exposicao_plantacao', coluna: 'id_face_exposicao' },
+    variedade: { tabela: 'plantacao', coluna: 'id_variedade' },
+  };
+
+  const idColumn = idColumnMap[tabela];
+  const dependenteInfo = dependenciasMap[tabela];
+
+  if (!idColumn || !dependenteInfo) {
+    Alert.alert('Erro', `Configuração de exclusão inválida para tabela '${tabela}'.`);
+    return false;
+  }
+
+  try {
+    await db.execAsync('BEGIN TRANSACTION;');
+
+    const dependente = await db.getFirstAsync(
+      `SELECT 1 FROM ${dependenteInfo.tabela} WHERE ${dependenteInfo.coluna} = ? LIMIT 1;`,
+      [id]
+    );
+
+    if (dependente) {
+      Alert.alert('Aviso', 'Este registro está vinculado a outro e não pode ser excluído.');
+      await db.execAsync('ROLLBACK;');
+      return false;
+    }
+
+    await db.runAsync(
+      `DELETE FROM ${tabela} WHERE ${idColumn} = ?;`,
+      [id]
+    );
+
+    await db.execAsync('COMMIT;');
+    Alert.alert('Sucesso', `Registro excluído de ${tabela}.`);
+    return true;
+
+  } catch (error) {
+    try { await db.execAsync('ROLLBACK;'); } catch (_) {}
+    console.error(`❌ Erro ao excluir em ${tabela}:`, error);
+    Alert.alert('Erro', `Erro ao excluir o registro de ${tabela}.`);
+    return false;
   }
 };
 

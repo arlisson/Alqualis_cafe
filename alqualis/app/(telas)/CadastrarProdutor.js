@@ -10,8 +10,9 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
 import { buscarRegistrosGenericos,
   inserirProdutor, 
-  buscarProdutorPorId} from '../../database/database';
-import { useLocalSearchParams } from 'expo-router';
+  buscarProdutorPorId,
+  atualizarProdutor} from '../../database/database';
+import { router, useLocalSearchParams } from 'expo-router';
 
 export default function CadastrarProdutor() {
   const [nome, setNome] = useState('');
@@ -111,9 +112,43 @@ export default function CadastrarProdutor() {
       }
     }
   } catch {
-    Alert.alert('Erro', 'Não foi possível cadastrar');
+    Alert.alert('Erro', 'Não foi possível cadastrar o produtor');
   }
 };
+
+const handleEditar = async () => {
+  setFormSubmitted(true);
+
+  const nomeValido = nome.trim() !== '';
+  const codigoValido = codigo.trim() !== '';
+
+  if (!nomeValido || !codigoValido) {
+    Alert.alert('Erro', 'Preencha todos os campos obrigatórios');
+    return;
+  }
+
+  try {
+    const payload = {
+      id_produtor: Number(id_produtor),
+      nome_produtor: nome.trim().toUpperCase(),
+      cpf_produtor: cpf ? cpf.replace(/\D/g, '') : null,
+      codigo_produtor: codigo.trim().toUpperCase(),
+      id_cooperativa: coop ? parseInt(coop.value, 10) : null,
+    };
+
+    const sucesso = await atualizarProdutor(payload);
+
+    if (sucesso) {
+      //Alert.alert('Sucesso', 'Produtor atualizado com sucesso!');
+      // Opcional: voltar ou atualizar tela
+      router.back();
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar produtor:', error);
+    //Alert.alert('Erro', 'Não foi possível atualizar o produtor.');
+  }
+};
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde,paddingBottom: RFValue(30) }}>
@@ -171,7 +206,7 @@ export default function CadastrarProdutor() {
       
       {id_produtor &&
       <>
-        <Botao texto='Editar' onPress={()=>console.log('sim')} cor={Cores.azul} foto = 'create-outline'/> 
+        <Botao texto='Editar' onPress={handleEditar} cor={Cores.azul} foto = 'create-outline'/> 
         <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
       </>
       }  

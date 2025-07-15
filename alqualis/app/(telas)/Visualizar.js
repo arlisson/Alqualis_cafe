@@ -12,6 +12,8 @@ import {
   buscarProdutoresCooperativa,
   buscarPlantacoesDetalhadas,
 } from '../../database/database';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 export default function Visualizar() {
   const { titulo, id } = useLocalSearchParams();
@@ -93,9 +95,13 @@ export default function Visualizar() {
     }
   };
 
-  useEffect(() => {
-    carregarDados();
-  }, [id, buscaAdiada]);
+  useFocusEffect(
+    React.useCallback(() => {
+      carregarDados();
+    }, [id, buscaAdiada])
+  );
+
+
 
   const handlePress = (row) => {
     console.log('--- Registro selecionado ---');

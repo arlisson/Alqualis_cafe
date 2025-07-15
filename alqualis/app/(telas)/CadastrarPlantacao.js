@@ -17,7 +17,8 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import {
   buscarRegistrosGenericos,
   inserirPlantacao,
-  buscarPlantacaoPorId
+  buscarPlantacaoPorId,
+  atualizarPlantacao
 } from '../../database/database';
 import { router, useLocalSearchParams } from 'expo-router';
 export default function CadastrarPlantacao() {
@@ -215,6 +216,46 @@ export default function CadastrarPlantacao() {
     }
   };
 
+  const handleAtualizar = async () => {
+  setFormSubmitted(true); // ativa mensagens de erro nos campos obrigatórios
+
+  if (!nomePropriedade.trim() || !nomeTalhao.trim() || !produtor || !variedade || !comunidade || !municipio) {
+    Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
+    return;
+  }
+
+  try {
+    const facesIds = facesSelecionadas
+      .map(nome => facesRows.find(f => f.nome_face_exposicao === nome))
+      .filter(Boolean)
+      .map(f => f.id_face_exposicao);
+
+    const sucesso = await atualizarPlantacao({
+      id_plantacao: Number(id_plantacao),
+      id_produtor: parseInt(produtor.value, 10),
+      id_variedade: parseInt(variedade.value, 10),
+      id_comunidade: parseInt(comunidade.value, 10),
+      id_municipio: parseInt(municipio.value, 10),
+      nome_plantacao: nomePropriedade.toUpperCase(),
+      latitude,
+      longitude,
+      altitude_media: altitude,
+      nome_talhao: nomeTalhao.toUpperCase(),
+      faces: facesIds,
+      meses_colheita: mesesSelecionados,
+    });
+
+    if (sucesso) {
+      router.back(); // volta para a tela anterior após sucesso
+    }
+
+  } catch (e) {
+    console.error('Erro ao atualizar plantação:', e);
+    //Alert.alert('Erro', 'Não foi possível atualizar a plantação.');
+  }
+};
+
+
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom: RFValue(30) }}>
       {id_plantacao &&
@@ -351,7 +392,7 @@ export default function CadastrarPlantacao() {
       
       {id_plantacao &&
       <>
-        <Botao texto='Editar' onPress={()=>console.log('sim')} cor={Cores.azul} foto = 'create-outline'/> 
+        <Botao texto='Editar' onPress={handleAtualizar} cor={Cores.azul} foto = 'create-outline'/> 
         <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
       </>
       }  

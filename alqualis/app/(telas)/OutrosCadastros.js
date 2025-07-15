@@ -5,11 +5,12 @@ import Cores from '../../constants/Cores';
 import Botao from '../../components/personalizados/Botao';
 import ViewCenter from '../../components/personalizados/ViewCenter';
 import Label from '../../components/personalizados/Label';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import {
   inserirGenerico,
   buscarRegistroGenericoPorId,
-  atualizarGenerico
+  atualizarGenerico,
+  excluirGenerico
 } from '../../database/database';
 
 // 🔹 Função utilitária para mapear id → nome da tabela
@@ -133,6 +134,7 @@ export default function OutrosCadastros() {
     if (sucesso) {
       console.log(`✅ ${titulo} atualizado(a) com ID: ${id_cadastro}`);
       setFormSubmitted(false);
+      router.back();
     }
 
   } catch (error) {
@@ -141,6 +143,36 @@ export default function OutrosCadastros() {
   }
 };
 
+const handleExcluir = async () => {
+  if (!config || !id_cadastro) {
+    Alert.alert('Erro', 'Informações para exclusão inválidas.');
+    return;
+  }
+
+  Alert.alert(
+    'Confirmar exclusão',
+    `Tem certeza que deseja excluir este(a) ${titulo?.toLowerCase()}?`,
+    [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const sucesso = await excluirGenerico(config.table, Number(id_cadastro));
+            if (sucesso) {
+              console.log(`🗑️ ${titulo} excluído(a) com ID: ${id_cadastro}`);
+              router.back(); // volta para a tela anterior
+            }
+          } catch (error) {
+            console.error(`❌ Erro ao excluir ${titulo}:`, error);
+            Alert.alert('Erro', `Não foi possível excluir ${titulo}.`);
+          }
+        }
+      }
+    ]
+  );
+};
 
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde }}>
@@ -172,7 +204,7 @@ export default function OutrosCadastros() {
       {id_cadastro &&
       <>
         <Botao texto='Editar' onPress={handleAtualizar} cor={Cores.azul} foto = 'create-outline'/> 
-        <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
+        <Botao texto='Excluir' onPress={handleExcluir} cor={Cores.vermelho} foto='trash-outline' /> 
       </>
       }  
     </View>
