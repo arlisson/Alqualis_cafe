@@ -11,7 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { buscarRegistrosGenericos,
   inserirProdutor, 
   buscarProdutorPorId,
-  atualizarProdutor} from '../../database/database';
+  atualizarProdutor,
+  excluirProdutor} from '../../database/database';
 import { router, useLocalSearchParams } from 'expo-router';
 
 export default function CadastrarProdutor() {
@@ -149,6 +150,34 @@ const handleEditar = async () => {
   }
 };
 
+const handleExcluir = async () => {
+  Alert.alert(
+    'Confirmar exclusão',
+    'Tem certeza que deseja excluir este produtor?',
+    [
+      {
+        text: 'Cancelar',
+        style: 'cancel',
+      },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const sucesso = await excluirProdutor(Number(id_produtor));
+            if (sucesso) {
+              router.back(); // volta para a tela anterior
+            }
+          } catch (error) {
+            console.error('Erro ao excluir produtor:', error);
+            Alert.alert('Erro', 'Não foi possível excluir o produtor.');
+          }
+        },
+      },
+    ]
+  );
+};
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde,paddingBottom: RFValue(30) }}>
@@ -207,7 +236,7 @@ const handleEditar = async () => {
       {id_produtor &&
       <>
         <Botao texto='Editar' onPress={handleEditar} cor={Cores.azul} foto = 'create-outline'/> 
-        <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
+        <Botao texto='Excluir' onPress={handleExcluir} cor={Cores.vermelho} foto='trash-outline' /> 
       </>
       }  
     </View>

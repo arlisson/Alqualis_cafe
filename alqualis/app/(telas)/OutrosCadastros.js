@@ -12,6 +12,7 @@ import {
   atualizarGenerico,
   excluirGenerico
 } from '../../database/database';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 // 🔹 Função utilitária para mapear id → nome da tabela
 const getNomeTabelaPorId = (id) => {
@@ -175,7 +176,7 @@ const handleExcluir = async () => {
 };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Cores.verde }}>
+    <View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom:RFValue(30) }}>
       {titulo &&
       <HeaderTitle texto={`Editar ${titulo}`} voltar="true" home="true" />
       }

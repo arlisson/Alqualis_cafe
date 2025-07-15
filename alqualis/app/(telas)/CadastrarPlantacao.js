@@ -18,7 +18,8 @@ import {
   buscarRegistrosGenericos,
   inserirPlantacao,
   buscarPlantacaoPorId,
-  atualizarPlantacao
+  atualizarPlantacao,
+  excluirPlantacao
 } from '../../database/database';
 import { router, useLocalSearchParams } from 'expo-router';
 export default function CadastrarPlantacao() {
@@ -255,6 +256,33 @@ export default function CadastrarPlantacao() {
   }
 };
 
+const handleExcluir = async () => {
+  Alert.alert(
+    'Confirmar exclusão',
+    'Tem certeza que deseja excluir esta plantação?',
+    [
+      {
+        text: 'Cancelar',
+        style: 'cancel',
+      },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const sucesso = await excluirPlantacao(Number(id_plantacao));
+            if (sucesso) {
+              router.back(); // volta para a tela anterior
+            }
+          } catch (error) {
+            console.error('Erro ao excluir plantação:', error);
+            Alert.alert('Erro', 'Não foi possível excluir a plantação.');
+          }
+        },
+      },
+    ]
+  );
+};
 
   return (
     <View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom: RFValue(30) }}>
@@ -393,7 +421,7 @@ export default function CadastrarPlantacao() {
       {id_plantacao &&
       <>
         <Botao texto='Editar' onPress={handleAtualizar} cor={Cores.azul} foto = 'create-outline'/> 
-        <Botao texto='Excluir' onPress={()=>console.log('calma calabreso')} cor={Cores.vermelho} foto='trash-outline' /> 
+        <Botao texto='Excluir' onPress={handleExcluir} cor={Cores.vermelho} foto='trash-outline' /> 
       </>
       }  
     </View>

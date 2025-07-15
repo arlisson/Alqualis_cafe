@@ -104,10 +104,10 @@ export default function Visualizar() {
 
 
   const handlePress = (row) => {
-    console.log('--- Registro selecionado ---');
-    row.forEach(({ label, value }) => {
-      console.log(`${label}: ${value}`);
-    });
+    // console.log('--- Registro selecionado ---');
+    // row.forEach(({ label, value }) => {
+    //   console.log(`${label}: ${value}`);
+    // });
     switch (parseInt(id)) {
       case 1:
         router.push({pathname:'(telas)/CadastrarProdutor',
