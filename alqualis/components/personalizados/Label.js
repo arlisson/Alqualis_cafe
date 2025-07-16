@@ -168,7 +168,7 @@ export default function Label({
         <View style={styles.inputHorizontalContainer}>
           <TextInput
             style={styles.input}
-            placeholder={label}
+            placeholder={label||'Digite aqui'}
             value={value}
             onChangeText={handleTextChange}
             keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
@@ -205,7 +205,7 @@ export default function Label({
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder={label}
+              placeholder={label||'Digite aqui'}
               value={value}
               onChangeText={handleTextChange}
               keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
@@ -258,7 +258,7 @@ export default function Label({
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <TextInput
                   style={styles.inputReadonly}
-                  placeholder={label}
+                  placeholder={label||'Digite aqui'}
                   value={displayValue}
                   editable={false}
                   scrollEnabled={false}

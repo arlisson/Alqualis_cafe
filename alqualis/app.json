@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "alqualis",
+    "name": "Alqualis Café",
     "slug": "alqualis",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,15 +8,21 @@
     "scheme": "alqualis",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/logo.jpeg",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff"
+    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/logo.jpeg",
+        "backgroundColor": "#fff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.arlisson.silva.alqualis"
     },
     "web": {
       "bundler": "metro",
@@ -28,16 +34,22 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo.jpeg",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#fff"
         }
       ],
       "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "aafc0e3b-34d6-4a4e-a2a4-d2dd58352757"
+      }
     }
   }
 }
