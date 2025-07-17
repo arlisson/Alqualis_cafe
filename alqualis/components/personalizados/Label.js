@@ -68,6 +68,11 @@ export default function Label({
   const [mensagemDuplicado, setMensagemDuplicado] = useState('');
   const debounceTimeout = useRef(null);
 
+  const removeSpaces = (value = '') => {
+    return value.replace(/\s+/g, '');
+  };
+
+
   const checarDuplicado = async (textoNormalizado) => {
   if (!verificarDuplicado || !textoNormalizado) {
     setValorDuplicado(false);
@@ -131,31 +136,33 @@ export default function Label({
 
   const displayValue = Array.isArray(selectedItems) ? selectedItems.join(', ') : '';
 
-  const handleTextChange = (text) => {
-    let formatted = text;
+ const handleTextChange = (text) => {
+  let formatted = text;
 
-    if (mask === 'cpf') {
-      formatted = formatCPF(text); // máscara visual
-    }
+  if (mask === 'cpf') {
+    formatted = formatCPF(text);
+  } else if (mask === 'noSpaces') {
+    formatted = removeSpaces(text);
+  }
 
-    onChangeText(formatted); // atualiza valor visível no input
+  onChangeText(formatted);
 
-    if (verificarDuplicado) {
-      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+  if (verificarDuplicado) {
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
-      debounceTimeout.current = setTimeout(() => {
-        let normalizado;
+    debounceTimeout.current = setTimeout(() => {
+      let normalizado;
 
-        if (mask === 'cpf') {
-          normalizado = text.replace(/\D/g, ''); // somente dígitos
-        } else {
-          normalizado = text.trim().toUpperCase(); // para campos tipo código
-        }
+      if (mask === 'cpf') {
+        normalizado = text.replace(/\D/g, '');
+      } else {
+        normalizado = removeSpaces(text.trim().toUpperCase());
+      }
 
-        checarDuplicado(normalizado);
-      }, 300);
-    }
-  };
+      checarDuplicado(normalizado);
+    }, 300);
+  }
+};
 
 
   if (horizontal) {

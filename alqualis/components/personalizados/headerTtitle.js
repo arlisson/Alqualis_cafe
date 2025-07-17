@@ -81,10 +81,12 @@ const styles = StyleSheet.create({
   titleContainer: {
     flex: 1,
     alignItems: 'center',
+    
   },
   title: {
     color: '#F3E8DF',
     fontSize: RFValue(18),
     fontWeight: 'bold',
+    textAlign:'center'
   },
 });

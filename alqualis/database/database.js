@@ -223,7 +223,7 @@ export const inserirProdutor = async ({
     const result = await database.runAsync(
       `INSERT INTO produtor (nome_produtor, cpf_produtor, codigo_produtor)
        VALUES (?, ?, ?);`,
-      [nome_produtor, cpf_produtor, codigo_produtor]
+      [nome_produtor, cpf_produtor, codigo_produtor.replace(/\s+/g, '')]
     );
     const id = result.lastInsertRowId;
 
@@ -1028,4 +1028,69 @@ export const excluirGenerico = async (tabela, id) => {
     return false;
   }
 };
+
+/**
+ * @description Retorna todos os dados em uma única tabela unificada, com:
+ * - nome_produtor, cpf, codigo_produtor, cooperativa
+ * - nome_plantacao, variedade, comunidade, municipio
+ * - latitude, longitude, altitude_media, nome_talhao
+ * - faces_exposicao (string), meses_colheita (array)
+ *
+ * @returns {Promise<Array<Object>>}
+ */
+export async function buscarTudoUnificado() {
+  const db = await openDatabase();
+  const sql = `
+    SELECT
+      p.nome_produtor       AS "Nome do Produtor",
+      p.cpf_produtor        AS "CPF do Produtor",
+      p.codigo_produtor     AS "Código do Produtor",
+      c.nome_cooperativa    AS "Cooperativa",
+      pl.nome_plantacao     AS "Nome da Plantação",
+      v.nome_variedade      AS "Variedade",
+      com.nome_comunidade   AS "Comunidade",
+      m.nome_municipio      AS "Município",
+      pl.latitude           AS "Latitude",
+      pl.longitude          AS "Longitude",
+      pl.altitude_media     AS "Altitude Média",
+      pl.nome_talhao        AS "Nome do Talhão",
+      pl.meses_colheita     AS "Meses de Colheita",
+      GROUP_CONCAT(fe.nome_face_exposicao, ', ') AS "Faces de Exposição"
+    FROM produtor p
+    LEFT JOIN cooperativa_produtor cp
+      ON cp.id_produtor = p.id_produtor
+    LEFT JOIN cooperativa c
+      ON c.id_cooperativa = cp.id_cooperativa
+    LEFT JOIN plantacao pl
+      ON pl.id_produtor = p.id_produtor
+    LEFT JOIN variedade v
+      ON v.id_variedade = pl.id_variedade
+    LEFT JOIN comunidade com
+      ON com.id_comunidade = pl.id_comunidade
+    LEFT JOIN municipio m
+      ON m.id_municipio = pl.id_municipio
+    LEFT JOIN face_exposicao_plantacao fep
+      ON fep.id_plantacao = pl.id_plantacao
+    LEFT JOIN face_exposicao fe
+      ON fe.id_face_exposicao = fep.id_face_exposicao
+    GROUP BY pl.id_plantacao
+    ORDER BY p.nome_produtor, pl.nome_plantacao;
+  `;
+
+  try {
+    const rows = await db.getAllAsync(sql);
+
+    return rows.map(row => ({
+      ...row,
+      "Meses de Colheita": row["Meses de Colheita"]
+        ? JSON.parse(row["Meses de Colheita"])
+        : [],
+    }));
+  } catch (error) {
+    console.error('❌ Erro ao buscar dados unificados:', error);
+    Alert.alert('Erro', 'Não foi possível carregar os dados completos.');
+    return [];
+  }
+}
+
 

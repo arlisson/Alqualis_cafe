@@ -40,7 +40,7 @@ export default function CadastrarProdutor() {
         
         setNome(produtor[0].nome_produtor || '');
         setCpf(produtor[0].cpf_produtor || '');
-        setCodigo(produtor[0].codigo_produtor || '');
+        setCodigo(produtor[0].codigo_produtor.trim() || '');
 
         if (produtor[0].id_cooperativa && produtor[0].cooperativa) {
           setCoop({
@@ -88,7 +88,7 @@ export default function CadastrarProdutor() {
     const payload = {
       nome_produtor: nome.trim().toUpperCase(),
       cpf_produtor: cpf ? cpf.replace(/\D/g, '') : null,
-      codigo_produtor: codigo.trim().toUpperCase(),
+      codigo_produtor: codigo.trim().toUpperCase().replace(/\s+/g, ''),
       id_cooperativa: coop ? parseInt(coop.value, 10) : null,
     };
 
@@ -133,7 +133,7 @@ const handleEditar = async () => {
       id_produtor: Number(id_produtor),
       nome_produtor: nome.trim().toUpperCase(),
       cpf_produtor: cpf ? cpf.replace(/\D/g, '') : null,
-      codigo_produtor: codigo.trim().toUpperCase(),
+      codigo_produtor: codigo.trim().toUpperCase().replace(/\s+/g, ''),
       id_cooperativa: coop ? parseInt(coop.value, 10) : null,
     };
 
@@ -213,6 +213,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}          
           verificarDuplicado={{ tabela: 'produtor', campo: 'codigo_produtor' }}
+          mask={'noSpaces'}
         />
         <Text style={styles.lastCode}>
           Último código: {lastCode || 'Nenhum'}
