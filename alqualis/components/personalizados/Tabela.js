@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -12,11 +13,13 @@ import Cores from '../../constants/Cores';
 export default function Tabela({
   header = [],
   data = [],
-  columnWidth = RFValue(100),
+  columnMinWidth = RFValue(100),
   onRowPress = () => {},
   hiddenColumns = [],
-  headerColor=Cores.marrom
+  headerColor = Cores.marrom,
 }) {
+  const screenWidth = Dimensions.get('window').width;
+
   const visibleIndices = header
     .map((_, index) => index)
     .filter((index) => !hiddenColumns.includes(index));
@@ -29,34 +32,33 @@ export default function Tabela({
     row.filter((_, index) => visibleIndices.includes(index))
   );
 
+  // 👇 Cálculo inteligente das larguras
+  const widthArr =
+    visibleIndices.length === 1
+      ? [screenWidth - 40] // menos padding/margin
+      : visibleIndices.map(() => columnMinWidth);
+
+  const totalWidth = widthArr.reduce((sum, w) => sum + w, 0);
+
   return (
     <View style={styles.wrapper}>
-      <ScrollView horizontal contentContainerStyle={styles.scrollContent}>
+      <ScrollView horizontal contentContainerStyle={{ width: totalWidth }}>
         <View style={styles.container}>
           <Table borderStyle={{ borderWidth: 1, borderColor: '#ccc' }}>
-            {/* Cabeçalho */}
             <Row
               data={filteredHeader}
-              style={[styles.head,{backgroundColor:headerColor}]}
+              style={[styles.head, { backgroundColor: headerColor }]}
               textStyle={styles.textHead}
-              widthArr={visibleIndices.map(() => columnWidth)}
+              widthArr={widthArr}
             />
 
-            {/* Dados ou mensagem de vazio */}
             {filteredData.length === 0 ? (
-              (() => {
-                const colCount = Math.max(1, filteredHeader.length);
-                const rowData = ['Nenhum registro encontrado', ...Array(colCount - 1).fill('')];
-                const widths = Array(colCount).fill(columnWidth);
-                return (
-                  <Row
-                    data={rowData}
-                    style={styles.noDataRow}
-                    textStyle={styles.noDataText}
-                    widthArr={widths}
-                  />
-                );
-              })()
+              <Row
+                data={['Nenhum registro encontrado']}
+                style={styles.noDataRow}
+                textStyle={styles.noDataText}
+                widthArr={[totalWidth]}
+              />
             ) : (
               filteredData.map((rowData, rowIndex) => (
                 <TouchableOpacity
@@ -76,7 +78,7 @@ export default function Tabela({
                       { backgroundColor: rowIndex % 2 === 0 ? '#f9f9f9' : '#e6f2ff' },
                     ]}
                     textStyle={styles.textRow}
-                    widthArr={visibleIndices.map(() => columnWidth)}
+                    widthArr={widthArr}
                   />
                 </TouchableOpacity>
               ))
@@ -94,17 +96,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scrollContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   container: {
     borderRadius: 10,
     overflow: 'hidden',
   },
   head: {
     height: RFValue(40),
-    
   },
   textHead: {
     textAlign: 'center',
@@ -113,17 +110,15 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   row: {
-    minHeight: RFValue(35), // permite crescer conforme conteúdo
+    minHeight: RFValue(35),
     alignItems: 'center',
   },
-
   textRow: {
-  textAlign: 'center',
-  fontSize: RFValue(12),
-  flexWrap: 'wrap',
-  paddingHorizontal: 5,
-},
-
+    textAlign: 'center',
+    fontSize: RFValue(12),
+    flexWrap: 'wrap',
+    paddingHorizontal: 5,
+  },
   noDataRow: {
     height: RFValue(35),
     backgroundColor: '#fff',

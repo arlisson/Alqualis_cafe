@@ -155,7 +155,7 @@ export const ImportarPlanilhaExcel = async (setLoading, prefixoCodigo = "CDANF")
 
           } catch (erroFinal) {
             console.error("Erro ao importar planilha:", erroFinal);
-            Alert.alert("Erro", "Falha ao importar a planilha.");
+            Alert.alert("Erro", `Falha ao importar a planilha. ${erroFinal}`);
           } finally {
             setLoading(false);
           }

@@ -181,7 +181,10 @@ export default function Label({
             value={value}
             onChangeText={handleTextChange}
             keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
+            scrollEnabled={false}
+            
           />
+          
           {icon && (
             <Ionicons
               name={icon}
@@ -218,6 +221,7 @@ export default function Label({
               value={value}
               onChangeText={handleTextChange}
               keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
+              scrollEnabled={false}
             />
             {icon && (
               <Ionicons
@@ -269,7 +273,7 @@ export default function Label({
                   style={styles.inputReadonly}
                   placeholder={label||'Digite aqui'}
                   value={displayValue}
-                  editable={false}
+                  editable={true}
                   scrollEnabled={false}
                 />
               </ScrollView>
@@ -322,17 +326,18 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: RFValue(10),
+    backgroundColor: '#fff',
+    height: RFValue(40),
+    justifyContent: 'space-between',
   },
   input: {
     flex: 1,
-    height: RFValue(35),
-    borderWidth: RFValue(1),
-    borderColor: '#000',
-    borderRadius: RFValue(8),
-    paddingHorizontal: RFValue(12),
-    backgroundColor: '#fff',
     fontSize: RFValue(14),
+    color: '#000',
+    
   },
   icon: {
     marginLeft: RFValue(10),
@@ -349,11 +354,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginRight: RFValue(10),
     minWidth: RFValue(100),
+    
   },
   inputHorizontalContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: RFValue(10),
   },
   inputIconContainer: {
     flexDirection: 'row',
