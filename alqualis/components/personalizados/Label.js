@@ -155,8 +155,10 @@ export default function Label({
 
       if (mask === 'cpf') {
         normalizado = text.replace(/\D/g, '');
-      } else {
+      } else if (mask === 'noSpaces') {
         normalizado = removeSpaces(text.trim().toUpperCase());
+      }else {
+        normalizado = text.trim().toUpperCase(); // ← normalização padrão
       }
 
       checarDuplicado(normalizado);

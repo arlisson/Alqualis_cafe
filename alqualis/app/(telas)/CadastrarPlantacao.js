@@ -22,8 +22,11 @@ import {
   excluirPlantacao
 } from '../../database/database';
 import { router, useLocalSearchParams } from 'expo-router';
+import NetInfo from '@react-native-community/netinfo';
+
+
 export default function CadastrarPlantacao() {
-  const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const meses = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
 
   const [formSubmitted, setFormSubmitted] = useState(false); // NOVO
 
@@ -135,18 +138,36 @@ export default function CadastrarPlantacao() {
   const [municipio, setMunicipio] = useState(null);
   const [facesSelecionadas, setFacesSelecionadas] = useState([]);
 
+  const verificaConexao = async ()=>{
+    const netInfo = await NetInfo.fetch();
+    if (!netInfo.isConnected) {
+      return Alert.alert('Sem conexão com a internet', 'Verifique sua conexão e tente novamente.');
+    }
+  };
+
   const pegarLocalizacao = async () => {
+    verificaConexao();
+
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       return Alert.alert('Permissão negada');
     }
-    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-    setLatitude(loc.coords.latitude.toFixed(6));
-    setLongitude(loc.coords.longitude.toFixed(6));
-    setAltitude(loc.coords.altitude?.toFixed(2) ?? 'N/A');
+
+    try {
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
+      setLatitude(loc.coords.latitude.toFixed(6));
+      setLongitude(loc.coords.longitude.toFixed(6));
+      setAltitude(loc.coords.altitude?.toFixed(2) ?? 'N/A');
+    } catch (error) {
+      Alert.alert('Erro ao obter localização', error.message || 'Tente novamente.');
+    }
   };
 
+
   const abrirMapa = async () => {
+
+    verificaConexao();
+
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       return Alert.alert('Permissão negada');

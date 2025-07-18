@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {
   View, Text, StyleSheet,
   Alert
@@ -10,14 +10,19 @@ import ViewCenter from '../components/personalizados/ViewCenter'
 import { router } from 'expo-router';
 import {createDatabase,
   deleteDatabase,
-  buscarTudoUnificado
+  buscarTudoUnificado,
 } from '../database/database';
 
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as XLSX from 'xlsx';
+import { ImportarPlanilhaExcel } from '../hooks/ImportarPlanilha';
+import Carregando from '../components/personalizados/Carregando';
+import PrefixoModal from '../components/personalizados/PrefixoModal';
 
 export default function Index() {  
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleCriarBanco = async () => {
     try {
@@ -104,7 +109,17 @@ export default function Index() {
     Alert.alert('Erro', 'Erro ao exportar para Excel');
   }
 };
+const [loading, setLoading] = useState(false);
+// ⬇ Função chamada ao pressionar o botão "Importar"
+  const handleImportar = () => {
+    setModalVisible(true);
+  };
 
+  // ⬇ Quando o usuário confirma o prefixo no modal
+  const handlePrefixoConfirmado = async (prefixo) => {
+    setModalVisible(false);
+    await ImportarPlanilhaExcel(setLoading, prefixo);
+  };
 
   return (
     <View style={{flex: 1, backgroundColor:Cores.verde }}>
@@ -125,7 +140,16 @@ export default function Index() {
 
         <Botao texto='Criar Banco' cor={Cores.azul} onPress={()=>handleCriarBanco()} />
         <Botao texto='Apagar Banco' cor={Cores.vermelho} onPress={() => deleteDatabase()} foto='trash-outline'/>
+        <Botao texto='Importar' cor={Cores.vinho} onPress={() =>handleImportar()} foto='download-outline'/>
+        <Carregando visible={loading}/>
         <Botao texto='Exportar' cor={Cores.caramelo} onPress={() =>handleExportar()} foto='share-outline'/>
+
+         {/* ⬇ MODAL DE PREFIXO */}
+        <PrefixoModal
+          visible={modalVisible}
+          onConfirm={handlePrefixoConfirmado}
+          onCancel={() => setModalVisible(false)}
+        />
       </ViewCenter>
       
     </View>

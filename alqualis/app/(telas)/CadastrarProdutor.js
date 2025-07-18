@@ -213,7 +213,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}          
           verificarDuplicado={{ tabela: 'produtor', campo: 'codigo_produtor' }}
-          mask={'noSpaces'}
+          mask='noSpaces'
         />
         <Text style={styles.lastCode}>
           Último código: {lastCode || 'Nenhum'}

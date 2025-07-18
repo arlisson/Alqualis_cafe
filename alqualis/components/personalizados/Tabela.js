@@ -4,7 +4,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Text,
 } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -114,12 +113,17 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   row: {
-    height: RFValue(35),
+    minHeight: RFValue(35), // permite crescer conforme conteúdo
+    alignItems: 'center',
   },
+
   textRow: {
-    textAlign: 'center',
-    fontSize: RFValue(12),
-  },
+  textAlign: 'center',
+  fontSize: RFValue(12),
+  flexWrap: 'wrap',
+  paddingHorizontal: 5,
+},
+
   noDataRow: {
     height: RFValue(35),
     backgroundColor: '#fff',

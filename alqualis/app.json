@@ -19,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.jpeg",
-        "backgroundColor": "#fff"
+        "backgroundColor": "#fff"        
       },
       "edgeToEdgeEnabled": true,
       "package": "com.arlisson.silva.alqualis"
@@ -29,6 +29,7 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+   
     "plugins": [
       "expo-router",
       [

@@ -136,28 +136,8 @@ export const createDatabase = async (mensagem = true) => {
       );
 
       CREATE INDEX IF NOT EXISTS idx_fep_face      ON face_exposicao_plantacao(id_face_exposicao);
-      CREATE INDEX IF NOT EXISTS idx_fep_plantacao ON face_exposicao_plantacao(id_plantacao);
-   
-      INSERT INTO cooperativa (nome_cooperativa) VALUES ('COOPAGRI');
-      INSERT INTO cooperativa (nome_cooperativa) VALUES ('AGROVALE');
-      INSERT INTO cooperativa (nome_cooperativa) VALUES ('COOPCAFÉ');
-
-      INSERT INTO municipio (nome_municipio) VALUES ('Lavras');
-      INSERT INTO municipio (nome_municipio) VALUES ('Patrocínio');
-      INSERT INTO municipio (nome_municipio) VALUES ('Manhuaçu');
-
-      INSERT INTO comunidade (nome_comunidade) VALUES ('Santa Rosa');
-      INSERT INTO comunidade (nome_comunidade) VALUES ('Boa Esperança');
-      INSERT INTO comunidade (nome_comunidade) VALUES ('Monte Verde');
-
-      INSERT INTO face_exposicao (nome_face_exposicao) VALUES ('Norte');
-      INSERT INTO face_exposicao (nome_face_exposicao) VALUES ('Sul');
-      INSERT INTO face_exposicao (nome_face_exposicao) VALUES ('Leste');
-
-      INSERT INTO variedade (nome_variedade) VALUES ('Catuaí Amarelo');
-      INSERT INTO variedade (nome_variedade) VALUES ('Bourbon Vermelho');
-      INSERT INTO variedade (nome_variedade) VALUES ('Mundo Novo');
-
+      CREATE INDEX IF NOT EXISTS idx_fep_plantacao ON face_exposicao_plantacao(id_plantacao);   
+      
     `);
 
     if (mensagem) {
@@ -186,8 +166,9 @@ export const inserirProdutor = async ({
   cpf_produtor = "",
   codigo_produtor = null,
   id_cooperativa = null,
+  mensagem = true,
 }) => {
-  if (!nome_produtor) {
+  if (!nome_produtor && mensagem) {
     Alert.alert("Erro", "O nome do produtor é obrigatório.");
     return null;
   }
@@ -202,7 +183,7 @@ export const inserirProdutor = async ({
         [cpf_produtor]
       );
       if (existeCPF) {
-        Alert.alert("Erro", "Este CPF já está cadastrado.");
+        mensagem ? Alert.alert("Erro", "Este CPF já está cadastrado.") : ''
         return null;
       }
     }
@@ -223,7 +204,7 @@ export const inserirProdutor = async ({
     const result = await database.runAsync(
       `INSERT INTO produtor (nome_produtor, cpf_produtor, codigo_produtor)
        VALUES (?, ?, ?);`,
-      [nome_produtor, cpf_produtor, codigo_produtor.replace(/\s+/g, '')]
+      [nome_produtor.toUpperCase(), cpf_produtor, codigo_produtor.replace(/\s+/g, '')]
     );
     const id = result.lastInsertRowId;
 
@@ -236,12 +217,12 @@ export const inserirProdutor = async ({
       );
     }
 
-    Alert.alert("Sucesso", "Produtor cadastrado com sucesso!");
+    mensagem ? Alert.alert("Sucesso", "Produtor cadastrado com sucesso!"): ''
     return id;
 
   } catch (error) {
     console.error("❌ Erro ao inserir produtor:", error);
-    Alert.alert("Erro", "Erro ao cadastrar o produtor.");
+    mensagem ? Alert.alert("Erro", "Erro ao cadastrar o produtor."): ''
     return null;
   }
 };
@@ -256,9 +237,10 @@ export const inserirProdutor = async ({
 export const associarProdutorCooperativa = async ({
   id_produtor,
   id_cooperativa,
+  mensagem = true
 }) => {
   if (!id_produtor || !id_cooperativa) {
-    Alert.alert("Erro", "Produtor e Cooperativa devem ser informados.");
+    mensagem ? Alert.alert("Erro", "Produtor e Cooperativa devem ser informados.") :''
     return false;
   }
   const database = await openDatabase();
@@ -269,11 +251,11 @@ export const associarProdutorCooperativa = async ({
        VALUES (?, ?);`,
       [id_cooperativa, id_produtor]
     );
-    Alert.alert("Sucesso", "Associação realizada com sucesso!");
+    mensagem ? Alert.alert("Sucesso", "Associação realizada com sucesso!") : ''
     return true;
   } catch (error) {
     console.error("❌ Erro ao associar produtor à cooperativa:", error);
-    Alert.alert("Erro", "Erro ao associar produtor à cooperativa.");
+    mensagem ? Alert.alert("Erro", "Erro ao associar produtor à cooperativa.") : ''
     return false;
   }
 };
@@ -293,9 +275,10 @@ export const atualizarProdutor = async ({
   cpf_produtor = "",
   codigo_produtor = null,
   id_cooperativa = null,
+  mensagem = true
 }) => {
   if (!id_produtor || !nome_produtor) {
-    Alert.alert("Erro", "ID e nome do produtor são obrigatórios.");
+    mensagem ? Alert.alert("Erro", "ID e nome do produtor são obrigatórios."): ''
     return false;
   }
 
@@ -309,7 +292,7 @@ export const atualizarProdutor = async ({
         [cpf_produtor, id_produtor]
       );
       if (cpfDuplicado) {
-        Alert.alert("Erro", "Este CPF já está cadastrado para outro produtor.");
+        mensagem ? Alert.alert("Erro", "Este CPF já está cadastrado para outro produtor.") : ''
         return false;
       }
     }
@@ -321,7 +304,7 @@ export const atualizarProdutor = async ({
         [codigo_produtor, id_produtor]
       );
       if (codigoDuplicado) {
-        Alert.alert("Erro", "Este código já está cadastrado para outro produtor.");
+        mensagem ? Alert.alert("Erro", "Este código já está cadastrado para outro produtor.") : ''
         return false;
       }
     }
@@ -349,12 +332,12 @@ export const atualizarProdutor = async ({
       );
     }
 
-    Alert.alert("Sucesso", "Produtor atualizado com sucesso!");
+    mensagem ? Alert.alert("Sucesso", "Produtor atualizado com sucesso!") : ''
     return true;
 
   } catch (error) {
     console.error("❌ Erro ao atualizar produtor:", error);
-    Alert.alert("Erro", "Erro ao atualizar o produtor.");
+    mensagem ? Alert.alert("Erro", "Erro ao atualizar o produtor.") : ''
     return false;
   }
 };
@@ -407,17 +390,17 @@ export const buscarRegistroGenericoPorId = async (nomeTabela, id) => {
  * @param {string} successMessage - Texto de sucesso no Alert
  * @returns {Promise<number|null>} ID inserido ou null em caso de erro
  */
-export const inserirGenerico = async (table, data, successMessage) => {
+export const inserirGenerico = async (table, data, successMessage, mensagem=true) => {
   const entries = Object.entries(data);
   if (entries.length !== 1) {
     throw new Error("inserirGenerico precisa de exatamente uma coluna/valor");
   }
 
   const [column, value] = entries[0];
-  const valor = value?.toString().trim();
+  const valor = value?.toString().trim().toUpperCase();
 
   if (!valor) {
-    Alert.alert("Erro", `O campo ${column} é obrigatório.`);
+    mensagem ? Alert.alert("Erro", `O campo ${column} é obrigatório.`) : ''
     return null;
   }
 
@@ -429,19 +412,19 @@ export const inserirGenerico = async (table, data, successMessage) => {
     const existing = await db.getFirstAsync(checkSql, [valor]);
 
     if (existing) {
-      Alert.alert("Aviso", `O valor "${valor}" já está cadastrado em ${table}.`);
+      mensagem ? Alert.alert("Aviso", `O valor "${valor}" já está cadastrado em ${table}.`):''
       return null;
     }
 
     // Inserção
     const insertSql = `INSERT INTO ${table} (${column}) VALUES (?);`;
     const result = await db.runAsync(insertSql, [valor]);
-    Alert.alert("Sucesso", successMessage);
+    mensagem ? Alert.alert("Sucesso", successMessage) : ''
     return result.lastInsertRowId;
 
   } catch (error) {
     console.error(`❌ Erro ao inserir em ${table}:`, error);
-    Alert.alert("Erro", `Erro ao cadastrar em ${table}.`);
+    mensagem ? Alert.alert("Erro", `Erro ao cadastrar em ${table}.`) :''
     return null;
   }
 };
@@ -455,10 +438,10 @@ export const inserirGenerico = async (table, data, successMessage) => {
  * @param {string} successMessage - Texto de sucesso no Alert
  * @returns {Promise<boolean>} true se sucesso, false caso erro
  */
-export const atualizarGenerico = async (table, column, value, id, successMessage) => {
+export const atualizarGenerico = async (table, column, value, id, successMessage, mensagem=true) => {
   const valor = value?.toString().trim();
   if (!valor) {
-    Alert.alert("Erro", `O campo ${column} é obrigatório.`);
+    mensagem ? Alert.alert("Erro", `O campo ${column} é obrigatório.`) : ''
     return false;
   }
 
@@ -470,7 +453,7 @@ export const atualizarGenerico = async (table, column, value, id, successMessage
     const existente = await db.getFirstAsync(checkSql, [valor, id]);
 
     if (existente) {
-      Alert.alert("Aviso", `Já existe um registro com o valor "${valor}" em ${table}.`);
+      mensagem ? Alert.alert("Aviso", `Já existe um registro com o valor "${valor}" em ${table}.`) :''
       return false;
     }
 
@@ -478,12 +461,12 @@ export const atualizarGenerico = async (table, column, value, id, successMessage
     const updateSql = `UPDATE ${table} SET ${column} = ? WHERE id_${table} = ?;`;
     await db.runAsync(updateSql, [valor, id]);
 
-    Alert.alert("Sucesso", successMessage);
+    mensagem ? Alert.alert("Sucesso", successMessage) : ''
     return true;
 
   } catch (error) {
     console.error(`❌ Erro ao atualizar ${table}:`, error);
-    Alert.alert("Erro", `Erro ao atualizar em ${table}.`);
+    mensagem ? Alert.alert("Erro", `Erro ao atualizar em ${table}.`) : ''
     return false;
   }
 };
@@ -697,13 +680,14 @@ export const inserirPlantacao = async ({
   altitude_media = null,
   nome_talhao = null,
   faces = [],
-  meses_colheita=null
+  meses_colheita=null,
+  mensagem = true
 }) => {
   const db = await openDatabase();
 
   // validação mínima
   if (!id_produtor || !id_variedade || !id_comunidade || !id_municipio || !nome_plantacao) {
-    Alert.alert('Erro', 'Campos obrigatórios não informados.');
+    mensagem ? Alert.alert('Erro', 'Campos obrigatórios não informados.') : ''
     return null;
   }
 
@@ -745,14 +729,14 @@ export const inserirPlantacao = async ({
     // 3) commita
     await db.execAsync('COMMIT;');
 
-    Alert.alert('Sucesso', 'Plantação cadastrada com sucesso!');
+    mensagem ? Alert.alert('Sucesso', 'Plantação cadastrada com sucesso!') : ''
     return id_plantacao;
 
   } catch (error) {
     // no erro, desfaz a transação
     try { await db.execAsync('ROLLBACK;'); } catch (_) {/* ignore */}
     console.error('❌ Erro ao cadastrar plantação:', error);
-    Alert.alert('Erro', 'Não foi possível cadastrar a plantação.');
+    mensagem ? Alert.alert('Erro', 'Não foi possível cadastrar a plantação.') : ''
     return null;
   }
 };
@@ -787,7 +771,8 @@ export const atualizarPlantacao = async ({
   altitude_media = null,
   nome_talhao = null,
   faces = [],
-  meses_colheita = null
+  meses_colheita = null, 
+  mensagem = true
 }) => {
   const db = await openDatabase();
 
@@ -795,7 +780,7 @@ export const atualizarPlantacao = async ({
     !id_plantacao || !id_produtor || !id_variedade || !id_comunidade ||
     !id_municipio || !nome_plantacao
   ) {
-    Alert.alert('Erro', 'Campos obrigatórios não informados.');
+    mensagem ? Alert.alert('Erro', 'Campos obrigatórios não informados.') : ''
     return false;
   }
 
@@ -847,13 +832,13 @@ export const atualizarPlantacao = async ({
     }
 
     await db.execAsync('COMMIT;');
-    Alert.alert('Sucesso', 'Plantação atualizada com sucesso!');
+    mensagem ? Alert.alert('Sucesso', 'Plantação atualizada com sucesso!') :''
     return true;
 
   } catch (error) {
     try { await db.execAsync('ROLLBACK;'); } catch (_) {}
     console.error('❌ Erro ao atualizar plantação:', error);
-    Alert.alert('Erro', 'Não foi possível atualizar a plantação.');
+    mensagem ? Alert.alert('Erro', 'Não foi possível atualizar a plantação.') : ''
     return false;
   }
 };

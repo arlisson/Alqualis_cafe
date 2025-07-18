@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useDeferredValue } from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import HeaderTitle from '../../components/personalizados/headerTtitle';
 import Cores from '../../constants/Cores';
 import ViewCenter from '../../components/personalizados/ViewCenter';
@@ -13,7 +13,7 @@ import {
   buscarPlantacoesDetalhadas,
 } from '../../database/database';
 import { useFocusEffect } from '@react-navigation/native';
-
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function Visualizar() {
   const { titulo, id, cor } = useLocalSearchParams();
@@ -24,12 +24,13 @@ export default function Visualizar() {
     4: 'municipio',
     5: 'comunidade',
     6: 'face_exposicao',
-    7:'variedade',
+    7: 'variedade',
   };
 
   const [header, setHeader] = useState([]);
   const [data, setData] = useState([]);
   const [busca, setBusca] = useState('');
+  const [loading, setLoading] = useState(false); // 👈 Estado de carregamento
   const buscaAdiada = useDeferredValue(busca);
 
   const formatHeader = (col) => {
@@ -42,56 +43,59 @@ export default function Visualizar() {
   };
 
   const carregarDados = async () => {
+    setLoading(true); // 👈 Ativa carregamento
     const tipo = parseInt(id, 10);
     const termoBusca = buscaAdiada.trim().toLowerCase();
-
     let registros = [];
 
-    if (tipo === 1) {
-      registros = await buscarProdutoresCooperativa();
-      registros = registros.map((item) => ({
-        ...item,
-        cooperativa: item.cooperativa?.trim() || 'Não participa',
-        cpf_produtor: item.cpf_produtor
-          ? item.cpf_produtor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
-          : 'Não informado',
-      }));
+    try {
+      if (tipo === 1) {
+        registros = await buscarProdutoresCooperativa();
+        registros = registros.map((item) => ({
+          ...item,
+          cooperativa: item.cooperativa?.trim() || 'Não participa',
+          cpf_produtor: item.cpf_produtor
+            ? item.cpf_produtor.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+            : 'Não informado',
+        }));
 
-      if (termoBusca) {
-        registros = registros.filter((r) =>
-          Object.values(r).some((val) =>
-            val?.toString().toLowerCase().includes(termoBusca)
-          )
-        );
+        if (termoBusca) {
+          registros = registros.filter((r) =>
+            Object.values(r).some((val) =>
+              val?.toString().toLowerCase().includes(termoBusca)
+            )
+          );
+        }
+      } else if (tipo === 2) {
+        registros = await buscarPlantacoesDetalhadas();
+
+        if (termoBusca) {
+          registros = registros.filter((r) =>
+            Object.values(r).some((val) =>
+              val?.toString().toLowerCase().includes(termoBusca)
+            )
+          );
+        }
+      } else {
+        const nomeTabela = tabelas[tipo];
+        if (!nomeTabela) return;
+
+        registros = termoBusca
+          ? await buscarRegistrosComFiltro(nomeTabela, termoBusca)
+          : await buscarRegistrosGenericos(nomeTabela);
       }
 
-    } else if (tipo === 2) {
-      registros = await buscarPlantacoesDetalhadas();
-
-      if (termoBusca) {
-        registros = registros.filter((r) =>
-          Object.values(r).some((val) =>
-            val?.toString().toLowerCase().includes(termoBusca)
-          )
-        );
+      if (registros.length) {
+        const colunas = Object.keys(registros[0]);
+        setHeader(colunas.map(formatHeader));
+        setData(registros.map(r => colunas.map(c => (r[c] ?? '').toString())));
+      } else {
+        setHeader([]);
+        setData([]);
       }
 
-    } else {
-      const nomeTabela = tabelas[tipo];
-      if (!nomeTabela) return;
-
-      registros = termoBusca
-        ? await buscarRegistrosComFiltro(nomeTabela, termoBusca)
-        : await buscarRegistrosGenericos(nomeTabela);
-    }
-
-    if (registros.length) {
-      const colunas = Object.keys(registros[0]);
-      setHeader(colunas.map(formatHeader));
-      setData(registros.map(r => colunas.map(c => (r[c] ?? '').toString())));
-    } else {
-      setHeader([]);
-      setData([]);
+    } finally {
+      setLoading(false); // 👈 Finaliza carregamento
     }
   };
 
@@ -101,32 +105,21 @@ export default function Visualizar() {
     }, [id, buscaAdiada])
   );
 
-
-
   const handlePress = (row) => {
-    // console.log('--- Registro selecionado ---');
-    // row.forEach(({ label, value }) => {
-    //   console.log(`${label}: ${value}`);
-    // });
     switch (parseInt(id)) {
       case 1:
-        router.push({pathname:'(telas)/CadastrarProdutor',
-        params:{id_produtor:row[0].value}
-      })
-      break;
+        router.push({ pathname: '(telas)/CadastrarProdutor', params: { id_produtor: row[0].value } });
+        break;
       case 2:
-        router.push({pathname:'(telas)/CadastrarPlantacao',
-          params:{id_plantacao:row[0].value}
-        })
-      break;
-
+        router.push({ pathname: '(telas)/CadastrarPlantacao', params: { id_plantacao: row[0].value } });
+        break;
       default:
-        router.push({pathname:'(telas)/OutrosCadastros',
-          params:{id_cadastro:row[0].value, id:id-2, titulo}
-        })
-      break;
+        router.push({
+          pathname: '(telas)/OutrosCadastros',
+          params: { id_cadastro: row[0].value, id: id - 2, titulo }
+        });
+        break;
     }
-   
   };
 
   return (
@@ -139,13 +132,18 @@ export default function Visualizar() {
           onChangeText={setBusca}
           value={busca}
         />
-        <Tabela
-          header={header}
-          data={data}
-          onRowPress={handlePress}
-          hiddenColumns={[0]} // esconde o ID
-          headerColor={cor}
-        />
+
+        {loading ? (
+          <Text style={{ marginTop: 20, fontSize: RFValue(16), alignSelf:'center', flex:1 }}>Carregando...</Text> // 👈 Exibe enquanto carrega
+        ) : (
+          <Tabela
+            header={header}
+            data={data}
+            onRowPress={handlePress}
+            hiddenColumns={[0]}
+            headerColor={cor}
+          />
+        )}
       </ViewCenter>
     </View>
   );
