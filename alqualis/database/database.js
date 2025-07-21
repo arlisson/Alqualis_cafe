@@ -183,7 +183,7 @@ export const inserirProdutor = async ({
         [cpf_produtor]
       );
       if (existeCPF) {
-        mensagem ? Alert.alert("Erro", "Este CPF já está cadastrado.") : ''
+        mensagem && Alert.alert("Erro", "Este CPF já está cadastrado.") 
         return null;
       }
     }
@@ -217,12 +217,12 @@ export const inserirProdutor = async ({
       );
     }
 
-    mensagem ? Alert.alert("Sucesso", "Produtor cadastrado com sucesso!"): ''
+    mensagem && Alert.alert("Sucesso", "Produtor cadastrado com sucesso!")
     return id;
 
   } catch (error) {
     //console.error("❌ Erro ao inserir produtor:", error);
-    mensagem ? Alert.alert("Erro", `Erro ao cadastrar o produtor.\n${error}`): ''
+    mensagem && Alert.alert("Erro", `Erro ao cadastrar o produtor.\n${error}`)
     return null;
   }
 };
@@ -240,7 +240,7 @@ export const associarProdutorCooperativa = async ({
   mensagem = true
 }) => {
   if (!id_produtor || !id_cooperativa) {
-    mensagem ? Alert.alert("Erro", "Produtor e Cooperativa devem ser informados.") :''
+    mensagem && Alert.alert("Erro", "Produtor e Cooperativa devem ser informados.") 
     return false;
   }
   const database = await openDatabase();
@@ -278,7 +278,7 @@ export const atualizarProdutor = async ({
   mensagem = true
 }) => {
   if (!id_produtor || !nome_produtor) {
-    mensagem ? Alert.alert("Erro", "ID e nome do produtor são obrigatórios."): ''
+    mensagem && Alert.alert("Erro", "ID e nome do produtor são obrigatórios.")
     return false;
   }
 
@@ -292,7 +292,7 @@ export const atualizarProdutor = async ({
         [cpf_produtor, id_produtor]
       );
       if (cpfDuplicado) {
-        mensagem ? Alert.alert("Erro", "Este CPF já está cadastrado para outro produtor.") : ''
+        mensagem && Alert.alert("Erro", "Este CPF já está cadastrado para outro produtor.") 
         return false;
       }
     }
@@ -304,7 +304,7 @@ export const atualizarProdutor = async ({
         [codigo_produtor, id_produtor]
       );
       if (codigoDuplicado) {
-        mensagem ? Alert.alert("Erro", "Este código já está cadastrado para outro produtor.") : ''
+        mensagem && Alert.alert("Erro", "Este código já está cadastrado para outro produtor.") 
         return false;
       }
     }
@@ -332,12 +332,12 @@ export const atualizarProdutor = async ({
       );
     }
 
-    mensagem ? Alert.alert("Sucesso", "Produtor atualizado com sucesso!") : ''
+    mensagem && Alert.alert("Sucesso", "Produtor atualizado com sucesso!") 
     return true;
 
   } catch (error) {
     console.error("❌ Erro ao atualizar produtor:", error);
-    mensagem ? Alert.alert("Erro", `Erro ao atualizar o produtor.\n${error}`) : ''
+    mensagem && Alert.alert("Erro", `Erro ao atualizar o produtor.\n${error}`) 
     return false;
   }
 };
@@ -400,7 +400,7 @@ export const inserirGenerico = async (table, data, successMessage, mensagem=true
   const valor = value?.toString().trim().toUpperCase();
 
   if (!valor) {
-    mensagem ? Alert.alert("Erro", `O campo ${column} é obrigatório.`) : ''
+    mensagem && Alert.alert("Erro", `O campo ${column} é obrigatório.`) 
     return null;
   }
 
@@ -412,19 +412,19 @@ export const inserirGenerico = async (table, data, successMessage, mensagem=true
     const existing = await db.getFirstAsync(checkSql, [valor]);
 
     if (existing) {
-      mensagem ? Alert.alert("Aviso", `O valor "${valor}" já está cadastrado em ${table}.`):''
+      mensagem && Alert.alert("Aviso", `O valor "${valor}" já está cadastrado em ${table}.`)
       return null;
     }
 
     // Inserção
     const insertSql = `INSERT INTO ${table} (${column}) VALUES (?);`;
     const result = await db.runAsync(insertSql, [valor]);
-    mensagem ? Alert.alert("Sucesso", successMessage) : ''
+    mensagem && Alert.alert("Sucesso", successMessage) 
     return result.lastInsertRowId;
 
   } catch (error) {
     //console.error(`❌ Erro ao inserir em ${table}:`, error);
-    mensagem ? Alert.alert("Erro", `Erro ao cadastrar em ${table}.\n${error}`) :''
+    mensagem && Alert.alert("Erro", `Erro ao cadastrar em ${table}.\n${error}`) 
     return null;
   }
 };
@@ -441,7 +441,7 @@ export const inserirGenerico = async (table, data, successMessage, mensagem=true
 export const atualizarGenerico = async (table, column, value, id, successMessage, mensagem=true) => {
   const valor = value?.toString().trim();
   if (!valor) {
-    mensagem ? Alert.alert("Erro", `O campo ${column} é obrigatório.`) : ''
+    mensagem && Alert.alert("Erro", `O campo ${column} é obrigatório.`) 
     return false;
   }
 
@@ -453,7 +453,7 @@ export const atualizarGenerico = async (table, column, value, id, successMessage
     const existente = await db.getFirstAsync(checkSql, [valor, id]);
 
     if (existente) {
-      mensagem ? Alert.alert("Aviso", `Já existe um registro com o valor "${valor}" em ${table}.`) :''
+      mensagem && Alert.alert("Aviso", `Já existe um registro com o valor "${valor}" em ${table}.`) 
       return false;
     }
 
@@ -461,12 +461,12 @@ export const atualizarGenerico = async (table, column, value, id, successMessage
     const updateSql = `UPDATE ${table} SET ${column} = ? WHERE id_${table} = ?;`;
     await db.runAsync(updateSql, [valor, id]);
 
-    mensagem ? Alert.alert("Sucesso", successMessage) : ''
+    mensagem && Alert.alert("Sucesso", successMessage) 
     return true;
 
   } catch (error) {
     //console.error(`❌ Erro ao atualizar ${table}:`, error);
-    mensagem ? Alert.alert("Erro", `Erro ao atualizar em ${table}.\n${error}`) : ''
+    mensagem && Alert.alert("Erro", `Erro ao atualizar em ${table}.\n${error}`) 
     return false;
   }
 };
@@ -690,7 +690,7 @@ export const inserirPlantacao = async ({
 
   // validação mínima
   if (!id_produtor || !id_variedade || !id_comunidade || !id_municipio || !nome_plantacao) {
-    mensagem ? Alert.alert('Erro', 'Campos obrigatórios não informados.') : ''
+    mensagem && Alert.alert('Erro', 'Campos obrigatórios não informados.') 
     return null;
   }
 
@@ -732,14 +732,14 @@ export const inserirPlantacao = async ({
     // 3) commita
     await db.execAsync('COMMIT;');
 
-    mensagem ? Alert.alert('Sucesso', 'Plantação cadastrada com sucesso!') : ''
+    mensagem && Alert.alert('Sucesso', 'Plantação cadastrada com sucesso!') 
     return id_plantacao;
 
   } catch (error) {
     // no erro, desfaz a transação
     try { await db.execAsync('ROLLBACK;'); } catch (_) {/* ignore */}
     //console.error('❌ Erro ao cadastrar plantação:', error);
-    mensagem ? Alert.alert('Erro', `Não foi possível cadastrar a plantação.\n${error}`) : ''
+    mensagem && Alert.alert('Erro', `Não foi possível cadastrar a plantação.\n${error}`) 
     return null;
   }
 };
@@ -783,7 +783,7 @@ export const atualizarPlantacao = async ({
     !id_plantacao || !id_produtor || !id_variedade || !id_comunidade ||
     !id_municipio || !nome_plantacao
   ) {
-    mensagem ? Alert.alert('Erro', 'Campos obrigatórios não informados.') : ''
+    mensagem && Alert.alert('Erro', 'Campos obrigatórios não informados.') 
     return false;
   }
 
@@ -835,13 +835,13 @@ export const atualizarPlantacao = async ({
     }
 
     await db.execAsync('COMMIT;');
-    mensagem ? Alert.alert('Sucesso', 'Plantação atualizada com sucesso!') :''
+    mensagem && Alert.alert('Sucesso', 'Plantação atualizada com sucesso!') 
     return true;
 
   } catch (error) {
     try { await db.execAsync('ROLLBACK;'); } catch (_) {}
     //console.error('❌ Erro ao atualizar plantação:', error);
-    mensagem ? Alert.alert('Erro', `Não foi possível atualizar a plantação.\n${error}`) : ''
+    mensagem && Alert.alert('Erro', `Não foi possível atualizar a plantação.\n${error}`) 
     return false;
   }
 };
