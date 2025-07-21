@@ -53,8 +53,8 @@ export default function CadastrarProdutor() {
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar produtor:', error);
-      Alert.alert('Erro', 'Não foi possível carregar os dados do produtor.');
+      //console.error('Erro ao carregar produtor:', error);
+      Alert.alert('Erro', `Não foi possível carregar os dados do produtor.\n${error}`);
     }
   })();
 }, [id_produtor]);
@@ -145,8 +145,8 @@ const handleEditar = async () => {
       router.back();
     }
   } catch (error) {
-    console.error('Erro ao atualizar produtor:', error);
-    //Alert.alert('Erro', 'Não foi possível atualizar o produtor.');
+    //console.error('Erro ao atualizar produtor:', error);
+    Alert.alert('Erro', `Não foi possível atualizar o produtor.\n${error}`);
   }
 };
 
@@ -169,8 +169,8 @@ const handleExcluir = async () => {
               router.back(); // volta para a tela anterior
             }
           } catch (error) {
-            console.error('Erro ao excluir produtor:', error);
-            Alert.alert('Erro', 'Não foi possível excluir o produtor.');
+            //console.error('Erro ao excluir produtor:', error);
+            Alert.alert('Erro', `Não foi possível excluir o produtor.\n${error}`);
           }
         },
       },

@@ -84,8 +84,8 @@ export default function CadastrarPlantacao() {
       setMunicipio(safeFind(municipiosOptions, dados.id_municipio));
 
     } catch (error) {
-      console.error('Erro ao carregar dados da plantação:', error);
-      Alert.alert('Erro', 'Não foi possível carregar os dados da plantação.');
+      //console.error('Erro ao carregar dados da plantação:', error);
+      Alert.alert('Erro', `Não foi possível carregar os dados da plantação.\n${error}`);
     }
   })();
 }, [
@@ -118,8 +118,8 @@ export default function CadastrarPlantacao() {
         const municipios = await buscarRegistrosGenericos('municipio');
         setMunicipiosOptions(municipios.map(m => ({ label: m.nome_municipio, value: m.id_municipio.toString() })));
       } catch (e) {
-        console.error('Erro ao carregar opções:', e);
-        Alert.alert('Erro', 'Não foi possível carregar dados iniciais.');
+        //console.error('Erro ao carregar opções:', e);
+        Alert.alert('Erro', `Não foi possível carregar dados iniciais.\n${e}`);
       }
     })();
   }, []);
@@ -234,7 +234,8 @@ export default function CadastrarPlantacao() {
         setFormSubmitted(false);
       }
     } catch (e) {
-      console.error(e);
+      //console.error(e);
+      Alert.alert('Erro',`${e}`)
     }
   };
 
@@ -272,8 +273,8 @@ export default function CadastrarPlantacao() {
     }
 
   } catch (e) {
-    console.error('Erro ao atualizar plantação:', e);
-    //Alert.alert('Erro', 'Não foi possível atualizar a plantação.');
+    //console.error('Erro ao atualizar plantação:', e);
+    Alert.alert('Erro', `Não foi possível atualizar a plantação.\n${e}`);
   }
 };
 
@@ -296,8 +297,8 @@ const handleExcluir = async () => {
               router.back(); // volta para a tela anterior
             }
           } catch (error) {
-            console.error('Erro ao excluir plantação:', error);
-            Alert.alert('Erro', 'Não foi possível excluir a plantação.');
+            //console.error('Erro ao excluir plantação:', error);
+            Alert.alert('Erro', `Não foi possível excluir a plantação.\n${error}`);
           }
         },
       },

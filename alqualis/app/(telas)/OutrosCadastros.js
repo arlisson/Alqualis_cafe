@@ -70,7 +70,7 @@ export default function OutrosCadastros() {
       if (!nomeTabela) return;
 
       const registro = await buscarRegistroGenericoPorId(nomeTabela, Number(id_cadastro));
-      console.log(registro)
+      //console.log(registro)
       if (registro && config.field) {
         setNome(registro[config.field] || '');
       }
@@ -100,13 +100,13 @@ export default function OutrosCadastros() {
         config.success
       );
       if (resultId) {
-        console.log(`✅ ${label} cadastrado(a) com ID: ${resultId}`);
+        //console.log(`✅ ${label} cadastrado(a) com ID: ${resultId}`);
         setNome('');
         setFormSubmitted(false);
       }
     } catch (error) {
-      console.error(`❌ Erro ao cadastrar ${label}:`, error);
-      Alert.alert('Erro', `Não foi possível cadastrar ${label}.`);
+      //console.error(`❌ Erro ao cadastrar ${label}:`, error);
+      Alert.alert('Erro', `Não foi possível cadastrar ${label}.\n${error}`);
     }
   };
 
@@ -133,14 +133,14 @@ export default function OutrosCadastros() {
     );
 
     if (sucesso) {
-      console.log(`✅ ${titulo} atualizado(a) com ID: ${id_cadastro}`);
+      //console.log(`✅ ${titulo} atualizado(a) com ID: ${id_cadastro}`);
       setFormSubmitted(false);
       router.back();
     }
 
   } catch (error) {
-    console.error(`❌ Erro ao atualizar ${titulo}:`, error);
-    Alert.alert('Erro', `Não foi possível atualizar ${titulo}.`);
+    //console.error(`❌ Erro ao atualizar ${titulo}:`, error);
+    Alert.alert('Erro', `Não foi possível atualizar ${titulo}.\n${error}`);
   }
 };
 
@@ -162,12 +162,12 @@ const handleExcluir = async () => {
           try {
             const sucesso = await excluirGenerico(config.table, Number(id_cadastro));
             if (sucesso) {
-              console.log(`🗑️ ${titulo} excluído(a) com ID: ${id_cadastro}`);
+              //console.log(`🗑️ ${titulo} excluído(a) com ID: ${id_cadastro}`);
               router.back(); // volta para a tela anterior
             }
           } catch (error) {
-            console.error(`❌ Erro ao excluir ${titulo}:`, error);
-            Alert.alert('Erro', `Não foi possível excluir ${titulo}.`);
+            //console.error(`❌ Erro ao excluir ${titulo}:`, error);
+            Alert.alert('Erro', `Não foi possível excluir ${titulo}.\n${error}`);
           }
         }
       }

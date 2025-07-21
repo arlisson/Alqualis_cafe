@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
+  Alert,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Ionicons } from '@expo/vector-icons';
@@ -102,7 +103,7 @@ export default function Label({
       setMensagemDuplicado('');
     }
   } catch (e) {
-    console.error('Erro ao verificar duplicidade:', e);
+    Alert.alert('Erro ao verificar duplicidade:', e);
   }
 };
 

@@ -33,12 +33,16 @@ export default function Tabela({
   );
 
   // 👇 Cálculo inteligente das larguras
+  // ✅ Garante ao menos uma coluna para evitar erro no reduce
   const widthArr =
-    visibleIndices.length === 1
-      ? [screenWidth - 40] // menos padding/margin
-      : visibleIndices.map(() => columnMinWidth);
+  visibleIndices.length === 0
+    ? [screenWidth - 40]
+    : visibleIndices.length === 1
+    ? [screenWidth - 40]
+    : visibleIndices.map(() => columnMinWidth);
 
   const totalWidth = widthArr.reduce((sum, w) => sum + w, 0);
+
 
   return (
     <View style={styles.wrapper}>
