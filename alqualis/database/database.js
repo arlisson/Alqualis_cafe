@@ -221,8 +221,8 @@ export const inserirProdutor = async ({
     return id;
 
   } catch (error) {
-    console.error("❌ Erro ao inserir produtor:", error);
-    mensagem ? Alert.alert("Erro", "Erro ao cadastrar o produtor."): ''
+    //console.error("❌ Erro ao inserir produtor:", error);
+    mensagem ? Alert.alert("Erro", `Erro ao cadastrar o produtor.\n${error}`): ''
     return null;
   }
 };
@@ -251,11 +251,11 @@ export const associarProdutorCooperativa = async ({
        VALUES (?, ?);`,
       [id_cooperativa, id_produtor]
     );
-    mensagem ? Alert.alert("Sucesso", "Associação realizada com sucesso!") : ''
+    mensagem && Alert.alert("Sucesso", "Associação realizada com sucesso!") 
     return true;
   } catch (error) {
-    console.error("❌ Erro ao associar produtor à cooperativa:", error);
-    mensagem ? Alert.alert("Erro", "Erro ao associar produtor à cooperativa.") : ''
+    //console.error("❌ Erro ao associar produtor à cooperativa:", error);
+    mensagem && Alert.alert("Erro", `Erro ao associar produtor à cooperativa.\n${error}`)
     return false;
   }
 };
@@ -337,7 +337,7 @@ export const atualizarProdutor = async ({
 
   } catch (error) {
     console.error("❌ Erro ao atualizar produtor:", error);
-    mensagem ? Alert.alert("Erro", "Erro ao atualizar o produtor.") : ''
+    mensagem ? Alert.alert("Erro", `Erro ao atualizar o produtor.\n${error}`) : ''
     return false;
   }
 };
@@ -355,8 +355,8 @@ export const buscarRegistrosGenericos = async (nomeTabela) => {
     );
     return rows;
   } catch (error) {
-    console.error(`❌ Erro ao buscar registros de ${nomeTabela}:`, error);
-    Alert.alert("Erro", `Não foi possível buscar ${nomeTabela}.`);
+    //console.error(`❌ Erro ao buscar registros de ${nomeTabela}:`, error);
+    Alert.alert("Erro", `Não foi possível buscar ${nomeTabela}.\n${error}`);
     return [];
   }
 };
@@ -376,8 +376,8 @@ export const buscarRegistroGenericoPorId = async (nomeTabela, id) => {
     );
     return row || null;
   } catch (error) {
-    console.error(`❌ Erro ao buscar registro em ${nomeTabela} por ID:`, error);
-    Alert.alert("Erro", `Não foi possível buscar o registro de ${nomeTabela}.`);
+    //console.error(`❌ Erro ao buscar registro em ${nomeTabela} por ID:`, error);
+    Alert.alert("Erro", `Não foi possível buscar o registro de ${nomeTabela}.\n${error}`);
     return null;
   }
 };
@@ -423,8 +423,8 @@ export const inserirGenerico = async (table, data, successMessage, mensagem=true
     return result.lastInsertRowId;
 
   } catch (error) {
-    console.error(`❌ Erro ao inserir em ${table}:`, error);
-    mensagem ? Alert.alert("Erro", `Erro ao cadastrar em ${table}.`) :''
+    //console.error(`❌ Erro ao inserir em ${table}:`, error);
+    mensagem ? Alert.alert("Erro", `Erro ao cadastrar em ${table}.\n${error}`) :''
     return null;
   }
 };
@@ -465,8 +465,8 @@ export const atualizarGenerico = async (table, column, value, id, successMessage
     return true;
 
   } catch (error) {
-    console.error(`❌ Erro ao atualizar ${table}:`, error);
-    mensagem ? Alert.alert("Erro", `Erro ao atualizar em ${table}.`) : ''
+    //console.error(`❌ Erro ao atualizar ${table}:`, error);
+    mensagem ? Alert.alert("Erro", `Erro ao atualizar em ${table}.\n${error}`) : ''
     return false;
   }
 };
@@ -496,7 +496,8 @@ export async function buscarProdutoresCooperativa() {
     const rows = await db.getAllAsync(sql);
     return rows;
   } catch (error) {
-    console.error('❌ Erro ao buscar produtores com cooperativa:', error);
+    //console.error('❌ Erro ao buscar produtores com cooperativa:', error);
+    Alert.alert('Erro',`Erro ao buscar produtores com cooperativa.\n${error}`)
     throw error;
   }
 }
@@ -526,7 +527,8 @@ export async function buscarProdutorPorId(idProdutor) {
     const row = await db.getAllAsync(sql, [idProdutor]);
     return row || null;
   } catch (error) {
-    console.error('❌ Erro ao buscar produtor por ID com cooperativa:', error);
+    //console.error('❌ Erro ao buscar produtor por ID com cooperativa:', error);
+    Alert.alert('Erro',`Erro ao buscar produtor por ID com cooperativa.\n${error}`)
     throw error;
   }
 }
@@ -597,7 +599,8 @@ export async function buscarPlantacoesDetalhadas() {
       meses_colheita: row.meses_colheita ? JSON.parse(row.meses_colheita) : []
     }));
   } catch (error) {
-    console.error('❌ Erro ao buscar plantações detalhadas:', error);
+    //console.error('❌ Erro ao buscar plantações detalhadas:', error);
+    Alert.alert('Erro',`Erro ao buscar plantações detalhadas.\n${error}`)
     throw error;
   }
 }
@@ -647,8 +650,8 @@ export async function buscarPlantacaoPorId(idPlantacao) {
     return plantacao;
 
   } catch (error) {
-    console.error('❌ Erro ao buscar plantação por ID:', error);
-    Alert.alert('Erro', 'Não foi possível carregar os dados da plantação.');
+    //console.error('❌ Erro ao buscar plantação por ID:', error);
+    Alert.alert('Erro', `Não foi possível carregar os dados da plantação.\n${error}`);
     return null;
   }
 }
@@ -735,8 +738,8 @@ export const inserirPlantacao = async ({
   } catch (error) {
     // no erro, desfaz a transação
     try { await db.execAsync('ROLLBACK;'); } catch (_) {/* ignore */}
-    console.error('❌ Erro ao cadastrar plantação:', error);
-    mensagem ? Alert.alert('Erro', 'Não foi possível cadastrar a plantação.') : ''
+    //console.error('❌ Erro ao cadastrar plantação:', error);
+    mensagem ? Alert.alert('Erro', `Não foi possível cadastrar a plantação.\n${error}`) : ''
     return null;
   }
 };
@@ -837,8 +840,8 @@ export const atualizarPlantacao = async ({
 
   } catch (error) {
     try { await db.execAsync('ROLLBACK;'); } catch (_) {}
-    console.error('❌ Erro ao atualizar plantação:', error);
-    mensagem ? Alert.alert('Erro', 'Não foi possível atualizar a plantação.') : ''
+    //console.error('❌ Erro ao atualizar plantação:', error);
+    mensagem ? Alert.alert('Erro', `Não foi possível atualizar a plantação.\n${error}`) : ''
     return false;
   }
 };
@@ -881,7 +884,8 @@ export const buscarRegistrosComFiltro = async (tabela, termoBusca) => {
     return resultados;
 
   } catch (error) {
-    console.error(`Erro ao buscar com filtro na tabela ${tabela}:`, error);
+    //console.error(`Erro ao buscar com filtro na tabela ${tabela}:`, error);
+    Alert.alert('Erro',`Erro ao buscar com filtro na tabela ${tabela}.\n${error}`)
     return [];
   }
 };
@@ -910,8 +914,8 @@ export const excluirPlantacao = async (id_plantacao) => {
     return true;
   } catch (error) {
     try { await db.execAsync('ROLLBACK;'); } catch (_) {}
-    console.error('❌ Erro ao excluir plantação:', error);
-    Alert.alert('Erro', 'Erro ao excluir a plantação.');
+    //console.error('❌ Erro ao excluir plantação:', error);
+    Alert.alert('Erro', `Erro ao excluir a plantação.\n${error}`);
     return false;
   }
 };
@@ -949,8 +953,8 @@ export const excluirProdutor = async (id_produtor) => {
     return true;
   } catch (error) {
     try { await db.execAsync('ROLLBACK;'); } catch (_) {}
-    console.error('❌ Erro ao excluir produtor:', error);
-    Alert.alert('Erro', 'Erro ao excluir o produtor.');
+    //console.error('❌ Erro ao excluir produtor:', error);
+    Alert.alert('Erro', `Erro ao excluir o produtor.\n${error}`);
     return false;
   }
 };
@@ -1008,8 +1012,8 @@ export const excluirGenerico = async (tabela, id) => {
 
   } catch (error) {
     try { await db.execAsync('ROLLBACK;'); } catch (_) {}
-    console.error(`❌ Erro ao excluir em ${tabela}:`, error);
-    Alert.alert('Erro', `Erro ao excluir o registro de ${tabela}.`);
+    //console.error(`❌ Erro ao excluir em ${tabela}:`, error);
+    Alert.alert('Erro', `Erro ao excluir o registro de ${tabela}.\n${error}`);
     return false;
   }
 };
@@ -1072,8 +1076,8 @@ export async function buscarTudoUnificado() {
         : [],
     }));
   } catch (error) {
-    console.error('❌ Erro ao buscar dados unificados:', error);
-    Alert.alert('Erro', 'Não foi possível carregar os dados completos.');
+    //console.error('❌ Erro ao buscar dados unificados:', error);
+    Alert.alert('Erro', `Não foi possível carregar os dados completos.\n${error}`);
     return [];
   }
 }

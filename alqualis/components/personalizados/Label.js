@@ -179,6 +179,7 @@ export default function Label({
           <TextInput
             style={styles.input}
             placeholder={label||'Digite aqui'}
+            placeholderTextColor={'#000'}
             value={value}
             onChangeText={handleTextChange}
             keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
@@ -219,6 +220,7 @@ export default function Label({
             <TextInput
               style={styles.input}
               placeholder={label||'Digite aqui'}
+              placeholderTextColor={'#000'}
               value={value}
               onChangeText={handleTextChange}
               keyboardType={mask === 'cpf' ? 'numeric' : 'default'}
@@ -273,6 +275,7 @@ export default function Label({
                 <TextInput
                   style={styles.inputReadonly}
                   placeholder={label||'Digite aqui'}
+                  placeholderTextColor={'#000'}
                   value={displayValue}
                   editable={true}
                   scrollEnabled={false}

@@ -17,6 +17,17 @@ export const ImportarPlanilhaExcel = async (setLoading, prefixoCodigo = "CDANF")
     face_exposicao: {},
   };
 
+  function buscarPorPalavraChave(obj, ...palavrasChave) {
+    const chave = Object.keys(obj).find(k =>
+      palavrasChave.some(palavra =>
+        k.toLowerCase().includes(palavra.toLowerCase())
+      )
+    );
+    return chave ? obj[chave] : undefined;
+  }
+
+
+
   let houveErros = false;
 
   const colunasEsperadas = [
@@ -36,7 +47,7 @@ export const ImportarPlanilhaExcel = async (setLoading, prefixoCodigo = "CDANF")
 
   Alert.alert(
     "Atenção",
-    `A planilha deve conter exatamente os seguintes nomes de colunas:\n\n- ${colunasEsperadas.join(
+    `A planilha deve conter os seguintes nomes de colunas:\n\n- ${colunasEsperadas.join(
       "\n- "
     )}`,
     [
@@ -69,20 +80,20 @@ export const ImportarPlanilhaExcel = async (setLoading, prefixoCodigo = "CDANF")
             for (let i = 0; i < data.length; i++) {
               try {
                 const row = data[i];
-                const nome_produtor = row["Nome do Produtor"]?.trim().toUpperCase();
-                const cpf_produtor = row["CPF"]?.replace(/\D/g, '') || "";
+                const nome_produtor = buscarPorPalavraChave(row, "nome", "produtor")?.trim().toUpperCase();
+                const cpf_produtor = buscarPorPalavraChave(row, "cpf")?.replace(/\D/g, '') || "";
                 const codigo_produtor = `${prefixoCodigo}${(i + 1).toString().padStart(2, "0")}`;
 
-                const nome_comunidade = row["Comunidade"]?.trim().toUpperCase();
-                const nome_municipio = row["Município"]?.trim().toUpperCase();
-                const nome_cooperativa = row["Cooperativa"]?.trim().toUpperCase();
-                const nome_variedade = row["Variedade"]?.trim().toUpperCase();
-                const nome_talhao = row["Talhão"]?.trim().toUpperCase();
-                const latitude = row["Latitude"]?.toString().trim().toUpperCase();
-                const longitude = row["Longitude"]?.toString().trim().toUpperCase();
-                const altitude = row["Altitude média"]?.toString().trim().toUpperCase();
-                const face_exposicao = row["Face de exposição"]?.trim().toUpperCase();
-                const meses_colheita_raw = row["Meses de Colheita"]?.trim().toUpperCase();
+                const nome_comunidade = buscarPorPalavraChave(row, "comunidade")?.trim().toUpperCase();
+                const nome_municipio = buscarPorPalavraChave(row, "município", "municipio")?.trim().toUpperCase();
+                const nome_cooperativa = buscarPorPalavraChave(row,"associação e/ou")?.trim().toUpperCase();
+                const nome_variedade = buscarPorPalavraChave(row, "variedade", "tipo")?.trim().toUpperCase();
+                const nome_talhao = buscarPorPalavraChave(row, "talhão", "talhao")?.trim().toUpperCase();
+                const latitude = buscarPorPalavraChave(row, "latitude")?.toString().trim().toUpperCase();
+                const longitude = buscarPorPalavraChave(row, "longitude")?.toString().trim().toUpperCase();
+                const altitude = buscarPorPalavraChave(row, "altitude")?.toString().trim().toUpperCase();
+                const face_exposicao = buscarPorPalavraChave(row, "face","sol")?.trim().toUpperCase();
+                const meses_colheita_raw = buscarPorPalavraChave(row, "colheita", "meses")?.trim().toUpperCase();
 
                 const meses_colheita = meses_colheita_raw
                   ? meses_colheita_raw.split(",").map(m => m.trim().toUpperCase())
