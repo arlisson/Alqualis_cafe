@@ -166,7 +166,7 @@ export default function CadastrarPlantacao() {
 
   const abrirMapa = async () => {
 
-    verificaConexao();
+    await verificaConexao();
 
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
