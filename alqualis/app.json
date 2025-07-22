@@ -26,12 +26,14 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ]
-
-
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB939_t8-dMQZpJO1ZfT2byiIZdCVyP6-I"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +42,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-location",
       [
         "expo-splash-screen",
         {
@@ -50,6 +53,7 @@
         }
       ],
       "expo-sqlite"
+      
     ],
     "experiments": {
       "typedRoutes": true

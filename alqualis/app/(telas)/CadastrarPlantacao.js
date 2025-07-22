@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import HeaderTitle from '../../components/personalizados/headerTtitle';
@@ -146,7 +147,7 @@ export default function CadastrarPlantacao() {
   };
 
   const pegarLocalizacao = async () => {
-    verificaConexao();
+    await verificaConexao();
 
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -165,28 +166,43 @@ export default function CadastrarPlantacao() {
 
 
   const abrirMapa = async () => {
+    try {
+      await verificaConexao();
 
-    await verificaConexao();
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        return Alert.alert('Permissão negada', 'A permissão de localização é necessária para abrir o mapa.');
+      }
 
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      return Alert.alert('Permissão negada');
+      const local = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+
+      const lat = local.coords.latitude;
+      const lon = local.coords.longitude;
+      const alt = local.coords.altitude;
+
+      setLatitude(lat.toFixed(6));
+      setLongitude(lon.toFixed(6));
+      setAltitude(alt?.toFixed(2) ?? '0.00');
+
+      setMapRegion({
+        latitude: lat,
+        longitude: lon,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+
+      setMapVisible(true);
+    } catch (e) {
+      Alert.alert('Erro', `Falha ao obter a localização atual:\n${e.message}`);
     }
-    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Highest });
-    setMapRegion({
-      latitude: loc.coords.latitude,
-      longitude: loc.coords.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    });
-    setMapVisible(true);
   };
+
 
   const selecionarLocalizacao = e => {
     const { latitude: lat, longitude: lon } = e.nativeEvent.coordinate;
     setLatitude(lat.toFixed(6));
     setLongitude(lon.toFixed(6));
-    setAltitude('N/A');
+    setAltitude('0.00');
     setMapVisible(false);
   };
 
@@ -409,9 +425,10 @@ const handleExcluir = async () => {
           mainIconName="calendar-outline"
         />
 
+        
         <Modal visible={mapVisible} animationType="slide">
           <View style={{ flex: 1 }}>
-            {mapRegion && (
+            {mapRegion && !isNaN(mapRegion.latitude) && !isNaN(mapRegion.longitude) && (
               <MapView
                 style={{ flex: 1 }}
                 initialRegion={mapRegion}
@@ -435,6 +452,7 @@ const handleExcluir = async () => {
             </TouchableOpacity>
           </View>
         </Modal>
+
       </ViewCenter>
       {!id_plantacao &&
         <Botao texto='Salvar' onPress={handleSalvar} /> 
