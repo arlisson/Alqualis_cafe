@@ -12,44 +12,83 @@
 ### Módulo 1: Gestão do Produtor de Café
 
 #### Tabela: `produtor`
+
 - `id_produtor`
 - `nome_produtor`
 - `cpf_produtor`
-
+- `codigo_produtor`
+---
 #### Tabela: `plantacao`
-- `id_plantacao`
-- `id_produtor`
-- `id_comunidade`
-- `id_municipio`
-- `id_cooperativa`
-- `id_variedade_plantada`
-- `latitude`
-- `longitude`
-- `altitude_media`
-- `face_exposicao`
-- `meses_colheita`
+
+* `id_plantacao`
+* `id_produtor`
+* `id_comunidade`
+* `id_municipio`
+* `id_cooperativa`
+* `id_variedade_plantada`
+* `id_face_exposicao`
+* `latitude`
+* `longitude`
+* `altitude_media`
+* `meses_colheita`
+* `nome_talhao`
+
+---
 
 #### Tabela: `comunidade`
-- `id_comunidade`
-- `nome_comunidade`
+
+* `id_comunidade`
+* `nome_comunidade`
+
+---
 
 #### Tabela: `municipio`
-- `id_municipio`
-- `nome_municipio`
+
+* `id_municipio`
+* `nome_municipio`
+
+---
 
 #### Tabela: `cooperativa`
-- `id_cooperativa`
-- `nome_cooperativa`
+
+* `id_cooperativa`
+* `nome_cooperativa`
+
+---
 
 #### Tabela: `variedade`
-- `id_variedade`
-- `nome_variedade`
+
+* `id_variedade`
+* `nome_variedade`
+
+---
 
 #### Tabela: `cooperativa_produtor`
-- `id_cooperativa_produtor`
-- `id_produtor`
-- `id_cooperativa`
-- 
+
+* `id_cooperativa_produtor`
+* `id_produtor`
+* `id_cooperativa`
+
+---
+
+#### Tabela: `face_exposicao`
+
+* `id_face_exposicao`
+* `nome_face_exposicao`
+
+---
+
+#### Tabela: `face_exposicao_plantacao`
+
+* `id_face_exposicao_plantacao`
+* `id_face_exposicao`
+* `id_plantacao`
+
+---
+
+Se quiser, posso gerar um diagrama ER simplificado ou JSON para auxiliar no entendimento do relacionamento entre as tabelas. Deseja isso?
+
+  
 <p  align="center"><b>Imagem 1: Diagrama Entidade Relacionamento</b></p>
  
 ![](https://github.com/arlisson/Alqualis_cafe/blob/main/imagens_projeto/modelo_der.png)
