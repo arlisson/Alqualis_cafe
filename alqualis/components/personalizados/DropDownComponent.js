@@ -13,7 +13,14 @@ import { RFValue } from 'react-native-responsive-fontsize';
   //   { label: 'Item 7', value: '7' },
   //   { label: 'Item 8', value: '8' },
   // ];
-
+/**
+ * 
+ * @param {*} data Vetor de dados do dropdown, exemplo: { label: 'Item 1', value: '1' }
+ * @param {*} label Título do Dropdown
+ * @param {*} onChange Função acionada quando o valor selecionado muda
+ * @param {*} value Valor selecionado, exemplo: { label: 'Item 1', value: '1' }
+ * @returns 
+ */
   const DropdownComponent = ({ data = [], label = 'Selecionar', onChange, value }) => {
   const [isFocus, setIsFocus] = useState(false);
   const [internalValue, setInternalValue] = useState(value?.value || null); // valor primitivo do objeto

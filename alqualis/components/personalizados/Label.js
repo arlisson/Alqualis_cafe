@@ -29,6 +29,66 @@ const formatCPF = (value = '') => {
   return formatted;
 };
 
+/**
+ * Componente Label
+ * 
+ * Componente reutilizável que renderiza um campo de formulário dinâmico (texto, dropdown ou seleção múltipla)
+ * com suporte a máscaras, validação obrigatória, verificação de duplicidade e exibição em linha.
+ *
+ * @component
+ * @param {String} label - Texto exibido como rótulo do campo.
+ * @param {Boolean} [input=false] - Define se o campo será um input de texto simples.
+ * @param {Boolean} [dropdown=false] - Define se o campo será um dropdown (combobox).
+ * @param {Boolean} [selectableInput=false] - Define se o campo será um input de seleção múltipla com modal.
+ * @param {Boolean} [horizontal=false] - Define se o campo será exibido na horizontal.
+ * @param {String|null} [icon=null] - Nome do ícone exibido no campo (Ionicons).
+ * @param {Function|null} [onIconPress=null] - Função chamada ao pressionar o ícone.
+ * @param {String|Array} [value=''] - Valor do campo (String para input/dropdown, array para múltipla seleção).
+ * @param {Function} onChangeText - Função chamada ao alterar o valor do campo.
+ * @param {Array} [data=[]] - Dados utilizados no dropdown (lista de objetos com label e value).
+ * @param {String|null} [mainIconName=null] - Ícone principal exibido no input de seleção múltipla.
+ * @param {Function|null} [onPressMainIcon=null] - Função chamada ao pressionar o ícone principal do input múltiplo.
+ * @param {JSX.Element|null} [extraIcon=null] - Ícone extra exibido ao lado do campo.
+ * @param {Boolean|null} [modalVisible=null] - Controle externo de visibilidade do modal de múltipla seleção.
+ * @param {Function|null} [setModalVisible=null] - Função para alterar a visibilidade do modal (modo controlado).
+ * @param {Function|null} [renderModalContent=null] - Função personalizada para renderizar o conteúdo do modal.
+ * @param {Array} [options=[]] - Lista de opções disponíveis para seleção múltipla.
+ * @param {String|null} [mask=null] - Define a máscara de entrada. Suporta: 'cpf' ou 'noSpaces'.
+ * @param {Boolean} [required=false] - Define se o campo é obrigatório.
+ * @param {Boolean} [showError=false] - Define se deve exibir mensagem de erro de campo obrigatório.
+ * @param {Object|null} [verificarDuplicado=null] - Objeto para validação de duplicidade: { tabela: String, campo: String }.
+ *
+ * @example
+ * <Label 
+ *   label="CPF" 
+ *   input 
+ *   mask="cpf" 
+ *   value={cpf} 
+ *   onChangeText={setCpf} 
+ *   required 
+ *   showError 
+ * />
+ * 
+ * @example
+ * <Label 
+ *   label="Produtor" 
+ *   dropdown 
+ *   data={[{ label: 'João', value: '1' }]} 
+ *   value={produtor} 
+ *   onChangeText={setProdutor} 
+ * />
+ * 
+ * @example
+ * <Label 
+ *   label="Meses" 
+ *   selectableInput 
+ *   options={['Janeiro', 'Fevereiro']} 
+ *   value={mesesSelecionados} 
+ *   onChangeText={setMesesSelecionados} 
+ * />
+ */
+
+
 export default function Label({
   label = 'Label',
   input = false,

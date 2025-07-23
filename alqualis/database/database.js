@@ -28,7 +28,7 @@ export const deleteDatabase = async () => {
     await SQLite.deleteDatabaseAsync(DB_NAME);
     Alert.alert("Sucesso", "🗑️ Banco de dados apagado com sucesso!");
   } catch (error) {
-    console.error("❌ Erro ao apagar banco:", error);
+    //console.error("❌ Erro ao apagar banco:", error);
     Alert.alert("Erro", "Não foi possível apagar o banco de dados.");
   }
 };
@@ -140,16 +140,15 @@ export const createDatabase = async (mensagem = true) => {
       
     `);
 
-    if (mensagem) {
-      Alert.alert("Sucesso", "Banco de dados criado com sucesso!");
-    }    
+   
+    mensagem && Alert.alert("Sucesso", "Banco de dados criado com sucesso!");
+     
     return database;
   
   } catch (error) {
-    console.error("❌ Erro ao criar banco de dados:", error);
-    if (mensagem) {
-      Alert.alert("Erro", "Erro ao criar o banco de dados.");
-    }
+    //console.error("❌ Erro ao criar banco de dados:", error);  
+     mensagem && Alert.alert("Erro", `Erro ao criar o banco de dados.\n${error}`);
+  
     throw error;
   } 
 };
@@ -336,7 +335,7 @@ export const atualizarProdutor = async ({
     return true;
 
   } catch (error) {
-    console.error("❌ Erro ao atualizar produtor:", error);
+    //console.error("❌ Erro ao atualizar produtor:", error);
     mensagem && Alert.alert("Erro", `Erro ao atualizar o produtor.\n${error}`) 
     return false;
   }
@@ -364,7 +363,7 @@ export const buscarRegistrosGenericos = async (nomeTabela) => {
 /**
  * @description Busca um único registro de uma tabela pelo ID
  * @param {string} nomeTabela - Nome da tabela (ex: 'produtor')
- * @param {number} id - ID do registro a ser buscado
+ * @param {*} id - ID do registro a ser buscado
  * @returns {Promise<Object|null>} Objeto com os dados ou null se não encontrado
  */
 export const buscarRegistroGenericoPorId = async (nomeTabela, id) => {
@@ -390,7 +389,7 @@ export const buscarRegistroGenericoPorId = async (nomeTabela, id) => {
  * @param {string} successMessage - Texto de sucesso no Alert
  * @returns {Promise<number|null>} ID inserido ou null em caso de erro
  */
-export const inserirGenerico = async (table, data, successMessage, mensagem=true) => {
+export const inserirGenerico = async (table, data, successMessage='Dado inserido com sucesso!', mensagem=true) => {
   const entries = Object.entries(data);
   if (entries.length !== 1) {
     throw new Error("inserirGenerico precisa de exatamente uma coluna/valor");
@@ -657,7 +656,7 @@ export async function buscarPlantacaoPorId(idPlantacao) {
 }
 
 /**
- * Insere uma plantação e associa múltiplas faces de exposição a ela.
+ * @description Insere uma plantação e associa múltiplas faces de exposição a ela.
  *
  * @param {Object} plantacao
  * @param {number} plantacao.id_produtor
@@ -745,7 +744,7 @@ export const inserirPlantacao = async ({
 };
 
 /**
- * Atualiza uma plantação existente e suas associações de face de exposição.
+ * @description Atualiza uma plantação existente e suas associações de face de exposição.
  *
  * @param {Object} plantacao
  * @param {number} plantacao.id_plantacao
@@ -849,8 +848,8 @@ export const atualizarPlantacao = async ({
 
 /**
  * 
- * @param {*} tabela 
- * @param {*} termoBusca 
+ * @param {String} tabela 
+ * @param {String} termoBusca 
  * @returns Retorna a busca feita no filtro
  */
 export const buscarRegistrosComFiltro = async (tabela, termoBusca) => {
@@ -891,7 +890,11 @@ export const buscarRegistrosComFiltro = async (tabela, termoBusca) => {
 };
 
 ///////////////////////// EXCLUIR ///////////////////////////////////////////////
-
+/**
+ * @description Exclui uma plantação
+ * @param {String} id_plantacao 
+ * 
+ */
 export const excluirPlantacao = async (id_plantacao) => {
   const db = await openDatabase();
   try {
@@ -920,6 +923,11 @@ export const excluirPlantacao = async (id_plantacao) => {
   }
 };
 
+/**
+ * @description Exclui um produtor
+ * @param {*} id_produtor 
+ * @returns 
+ */
 export const excluirProdutor = async (id_produtor) => {
   const db = await openDatabase();
   try {
@@ -959,7 +967,12 @@ export const excluirProdutor = async (id_produtor) => {
   }
 };
 
-
+/**
+ * @description Excluir dados genéricos
+ * @param {*} tabela 
+ * @param {*} id 
+ * @returns 
+ */
 export const excluirGenerico = async (tabela, id) => {
   const db = await openDatabase();
 

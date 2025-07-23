@@ -10,6 +10,33 @@ import { Table, Row } from 'react-native-table-component';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Cores from '../../constants/Cores';
 
+/**
+ * Componente Tabela
+ *
+ * Exibe uma tabela rolável horizontalmente com cabeçalho e linhas de dados,
+ * permitindo ocultar colunas específicas e acionar um evento ao clicar em uma linha.
+ *
+ * @component
+ * @param {Array<string>} header - Array com os nomes das colunas do cabeçalho.
+ * @param {Array<Array<any>>} data - Array bidimensional contendo os dados das linhas da tabela.
+ * @param {number} [columnMinWidth=RFValue(100)] - Largura mínima de cada coluna.
+ * @param {Function} [onRowPress=() => {}] - Função chamada ao clicar em uma linha, recebe a linha completa no formato `{ label, value }`.
+ * @param {Array<number>} [hiddenColumns=[]] - Índices das colunas que devem ser ocultadas.
+ * @param {string} [headerColor=Cores.marrom] - Cor de fundo do cabeçalho.
+ *
+ * @example
+ * <Tabela
+ *   header={['ID', 'Nome', 'Email']}
+ *   data={[
+ *     [1, 'João', 'joao@email.com'],
+ *     [2, 'Maria', 'maria@email.com']
+ *   ]}
+ *   columnMinWidth={120}
+ *   hiddenColumns={[0]}
+ *   onRowPress={(row) => console.log('Linha clicada:', row)}
+ * />
+ */
+
 export default function Tabela({
   header = [],
   data = [],

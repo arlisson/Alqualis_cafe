@@ -10,6 +10,25 @@ import {
 } from "react-native";
 import Cores from "../../constants/Cores";
 
+/**
+ * Componente PrefixoModal
+ * 
+ * Modal para entrada e confirmação de um prefixo textual (ex.: código de produtor).
+ * Usado para capturar e validar uma string antes de salvar.
+ *
+ * @component
+ * @param {Boolean} visible - Define se o modal está visível.
+ * @param {Function} onConfirm - Função chamada ao confirmar, recebe o prefixo (string) já normalizado em letras maiúsculas.
+ * @param {Function} onCancel - Função chamada ao cancelar o modal.
+ *
+ * @example
+ * <PrefixoModal
+ *   visible={showModal}
+ *   onConfirm={(prefixo) => console.log('Prefixo selecionado:', prefixo)}
+ *   onCancel={() => setShowModal(false)}
+ * />
+ */
+
 export default function PrefixoModal({ visible, onConfirm, onCancel }) {
   const [prefixo, setPrefixo] = useState("CDANF");
 
