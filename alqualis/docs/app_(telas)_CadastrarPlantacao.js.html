@@ -1,4 +1,32 @@
-import React, { useState, useEffect } from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/(telas)/CadastrarPlantacao.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/(telas)/CadastrarPlantacao.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -326,15 +354,15 @@ const handleExcluir = async () => {
 };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom: RFValue(30) }}>
-      {id_plantacao &&
-       <HeaderTitle texto='Editar Plantação' voltar='true' home='true' />
+    &lt;View style={{ flex: 1, backgroundColor: Cores.verde, paddingBottom: RFValue(30) }}>
+      {id_plantacao &amp;&amp;
+       &lt;HeaderTitle texto='Editar Plantação' voltar='true' home='true' />
       }
-      {!id_plantacao &&
-       <HeaderTitle texto='Cadastrar Plantação' voltar='true' home='true' />
+      {!id_plantacao &amp;&amp;
+       &lt;HeaderTitle texto='Cadastrar Plantação' voltar='true' home='true' />
       }
-      <ViewCenter>
-        <Label
+      &lt;ViewCenter>
+        &lt;Label
           label='Nome da propriedade'
           input
           onChangeText={setNomePropriedade}
@@ -342,7 +370,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}
         />
-        <Label
+        &lt;Label
           label='Nome do Talhão'
           input
           onChangeText={setNomeTalhao}
@@ -350,7 +378,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}
         />
-        <Label
+        &lt;Label
           label="Face de Exposição"
           selectableInput
           options={facesOptions}
@@ -358,7 +386,7 @@ const handleExcluir = async () => {
           value={facesSelecionadas}
           onChangeText={setFacesSelecionadas}
         />
-        <Label
+        &lt;Label
           label='Produtor'
           dropdown
           data={produtoresOptions}
@@ -367,7 +395,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}
         />
-        <Label
+        &lt;Label
           label='Variedade'
           dropdown
           data={variedadesOptions}
@@ -376,7 +404,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}
         />
-        <Label
+        &lt;Label
           label='Comunidade'
           dropdown
           data={comunidadesOptions}
@@ -385,7 +413,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}
         />
-        <Label
+        &lt;Label
           label='Município'
           dropdown
           data={municipiosOptions}
@@ -394,7 +422,7 @@ const handleExcluir = async () => {
           required
           showError={formSubmitted}
         />
-        <Label
+        &lt;Label
           label='Latitude'
           horizontal
           input
@@ -402,24 +430,24 @@ const handleExcluir = async () => {
           onChangeText={setLatitude}
           
         />
-        <Label
+        &lt;Label
           label='Longitude'
           horizontal
           input
           value={longitude}
           onChangeText={setLongitude}
         />
-        <Label
+        &lt;Label
           label='Altitude'
           horizontal
           input
           value={altitude}
           onChangeText={setAltitude}
         />
-        <Botao texto='Pegar localização' foto='pin-outline' onPress={pegarLocalizacao} />
-        <Botao texto='Selecionar no mapa' foto='map-outline' onPress={abrirMapa} />
+        &lt;Botao texto='Pegar localização' foto='pin-outline' onPress={pegarLocalizacao} />
+        &lt;Botao texto='Selecionar no mapa' foto='map-outline' onPress={abrirMapa} />
 
-        <Label
+        &lt;Label
           label="Meses de Colheita"
           selectableInput
           options={meses}
@@ -429,44 +457,67 @@ const handleExcluir = async () => {
         />
 
         
-        <Modal visible={mapVisible} animationType="slide">
-          <View style={{ flex: 1 }}>
-            {mapRegion && !isNaN(mapRegion.latitude) && !isNaN(mapRegion.longitude) && (
-              <MapView
+        &lt;Modal visible={mapVisible} animationType="slide">
+          &lt;View style={{ flex: 1 }}>
+            {mapRegion &amp;&amp; !isNaN(mapRegion.latitude) &amp;&amp; !isNaN(mapRegion.longitude) &amp;&amp; (
+              &lt;MapView
                 style={{ flex: 1 }}
                 initialRegion={mapRegion}
                 onPress={selecionarLocalizacao}
               >
-                <Marker
+                &lt;Marker
                   coordinate={{
                     latitude: parseFloat(latitude) || mapRegion.latitude,
                     longitude: parseFloat(longitude) || mapRegion.longitude,
                   }}
                 />
-              </MapView>
+              &lt;/MapView>
             )}
-            <TouchableOpacity
+            &lt;TouchableOpacity
               onPress={() => setMapVisible(false)}
               style={{ padding: 15, backgroundColor: 'black' }}
             >
-              <Text style={{ color: 'white', textAlign: 'center' }}>
+              &lt;Text style={{ color: 'white', textAlign: 'center' }}>
                 Fechar mapa
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+              &lt;/Text>
+            &lt;/TouchableOpacity>
+          &lt;/View>
+        &lt;/Modal>
 
-      </ViewCenter>
-      {!id_plantacao &&
-        <Botao texto='Salvar' onPress={handleSalvar} /> 
+      &lt;/ViewCenter>
+      {!id_plantacao &amp;&amp;
+        &lt;Botao texto='Salvar' onPress={handleSalvar} /> 
       }     
       
-      {id_plantacao &&
-      <>
-        <Botao texto='Editar' onPress={handleAtualizar} cor={Cores.azul} foto = 'create-outline'/> 
-        <Botao texto='Excluir' onPress={handleExcluir} cor={Cores.vermelho} foto='trash-outline' /> 
-      </>
+      {id_plantacao &amp;&amp;
+      &lt;>
+        &lt;Botao texto='Editar' onPress={handleAtualizar} cor={Cores.azul} foto = 'create-outline'/> 
+        &lt;Botao texto='Excluir' onPress={handleExcluir} cor={Cores.vermelho} foto='trash-outline' /> 
+      &lt;/>
       }  
-    </View>
+    &lt;/View>
   );
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#DropdownComponent">DropdownComponent</a></li><li><a href="global.html#ImportarPlanilhaExcel">ImportarPlanilhaExcel</a></li><li><a href="global.html#associarProdutorCooperativa">associarProdutorCooperativa</a></li><li><a href="global.html#atualizarGenerico">atualizarGenerico</a></li><li><a href="global.html#atualizarPlantacao">atualizarPlantacao</a></li><li><a href="global.html#atualizarProdutor">atualizarProdutor</a></li><li><a href="global.html#buscarPlantacaoPorId">buscarPlantacaoPorId</a></li><li><a href="global.html#buscarPlantacoesDetalhadas">buscarPlantacoesDetalhadas</a></li><li><a href="global.html#buscarProdutorPorId">buscarProdutorPorId</a></li><li><a href="global.html#buscarProdutoresCooperativa">buscarProdutoresCooperativa</a></li><li><a href="global.html#buscarRegistroGenericoPorId">buscarRegistroGenericoPorId</a></li><li><a href="global.html#buscarRegistrosComFiltro">buscarRegistrosComFiltro</a></li><li><a href="global.html#buscarRegistrosGenericos">buscarRegistrosGenericos</a></li><li><a href="global.html#buscarTudoUnificado">buscarTudoUnificado</a></li><li><a href="global.html#createDatabase">createDatabase</a></li><li><a href="global.html#deleteDatabase">deleteDatabase</a></li><li><a href="global.html#excluirGenerico">excluirGenerico</a></li><li><a href="global.html#excluirPlantacao">excluirPlantacao</a></li><li><a href="global.html#excluirProdutor">excluirProdutor</a></li><li><a href="global.html#fs">fs</a></li><li><a href="global.html#inserirGenerico">inserirGenerico</a></li><li><a href="global.html#inserirPlantacao">inserirPlantacao</a></li><li><a href="global.html#inserirProdutor">inserirProdutor</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 30 2025 12:08:10 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

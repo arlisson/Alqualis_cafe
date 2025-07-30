@@ -1,4 +1,32 @@
-import React, {useState} from 'react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app/(telas)/TelaInicial.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app/(telas)/TelaInicial.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, {useState} from 'react';
 import {
   View, Text, StyleSheet, Modal
 } from 'react-native';
@@ -129,108 +157,131 @@ export default function TelaInicial() {
   }
 };  
   return (
-    <View style={{flex: 1, backgroundColor:Cores.verde }}>
-      <HeaderTitle  texto={titulo} voltar={true} home = {true}/>
-      <ViewCenter>
-        {produtor &&
-            <>
-                <Botao texto='Cadastrar Produtor' foto='person-add-outline'
+    &lt;View style={{flex: 1, backgroundColor:Cores.verde }}>
+      &lt;HeaderTitle  texto={titulo} voltar={true} home = {true}/>
+      &lt;ViewCenter>
+        {produtor &amp;&amp;
+            &lt;>
+                &lt;Botao texto='Cadastrar Produtor' foto='person-add-outline'
                 cor={Cores.marrom}
                 onPress={() => router.push('(telas)/CadastrarProdutor')}
                 />
-                <Botao texto='Visualizar Produtor' foto='eye-outline'
+                &lt;Botao texto='Visualizar Produtor' foto='eye-outline'
                 cor={Cores.marrom}
                 onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Produtor', id: '1' } })}
                 />
-            </>
+            &lt;/>
         }
         
-        {plantacao &&
-        <>
-            <Botao texto='Cadastrar Plantação' foto='leaf-outline'
+        {plantacao &amp;&amp;
+        &lt;>
+            &lt;Botao texto='Cadastrar Plantação' foto='leaf-outline'
             cor={Cores.azul}
             onPress={() => router.push('(telas)/CadastrarPlantacao')}
             />
-            <Botao texto='Visualizar Plantação' foto='eye-outline'
+            &lt;Botao texto='Visualizar Plantação' foto='eye-outline'
             cor={Cores.azul}
             onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Plantação', id: '2', cor:Cores.azul } })}
             />
         
-        </>
+        &lt;/>
         }
         
-        {outros &&
-        <>
-            <Botao texto='Cadastrar Cooperativa' foto='storefront-outline'
+        {outros &amp;&amp;
+        &lt;>
+            &lt;Botao texto='Cadastrar Cooperativa' foto='storefront-outline'
             cor={Cores.caramelo}
             onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Cooperativa', id: '1' } })}
             />
-            <Botao texto='Visualizar Cooperativas' foto='eye-outline'
+            &lt;Botao texto='Visualizar Cooperativas' foto='eye-outline'
             cor={Cores.caramelo}
             onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Cooperativa', id: '3',cor:Cores.caramelo } })}
             />
 
-            <Botao texto='Cadastrar Município' foto='business-outline'
+            &lt;Botao texto='Cadastrar Município' foto='business-outline'
             cor={Cores.verdeMusgo}
             onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Município', id: '2' } })}
             />
-            <Botao texto='Visualizar Município' foto='eye-outline'
+            &lt;Botao texto='Visualizar Município' foto='eye-outline'
             cor={Cores.verdeMusgo}
             onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Município', id: '4',cor:Cores.verdeMusgo } })}
             />
 
-            <Botao texto='Cadastrar Comunidade' foto='people-outline'
+            &lt;Botao texto='Cadastrar Comunidade' foto='people-outline'
             cor={Cores.terracota}
             onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Comunidade', id: '3' } })}
             />
-            <Botao texto='Visualizar Comunidades' foto='eye-outline'
+            &lt;Botao texto='Visualizar Comunidades' foto='eye-outline'
             cor={Cores.terracota}
             onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Comunidade', id: '5',cor:Cores.terracota } })}
             />
 
-            <Botao texto='Cadastrar Face de Exposição' foto='sunny-outline'
+            &lt;Botao texto='Cadastrar Face de Exposição' foto='sunny-outline'
             cor={Cores.oliva}
             onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Face de Exposição', id: '4' } })}
             />
-            <Botao texto='Visualizar Face de Exposição' foto='eye-outline'
+            &lt;Botao texto='Visualizar Face de Exposição' foto='eye-outline'
             cor={Cores.oliva}
             onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Face de Exposição', id: '6',cor:Cores.oliva } })}
             />
 
-            <Botao texto='Cadastrar Variedade' foto='eyedrop-outline'
+            &lt;Botao texto='Cadastrar Variedade' foto='eyedrop-outline'
             cor={Cores.vinho}
             onPress={() => router.push({ pathname: '(telas)/OutrosCadastros', params: { label: 'Variedade', id: '5' } })}
             />
-            <Botao texto='Visualizar Variedade' foto='eye-outline'
+            &lt;Botao texto='Visualizar Variedade' foto='eye-outline'
             cor={Cores.vinho}
             onPress={() => router.push({ pathname: '(telas)/Visualizar', params: { titulo: 'Variedade', id: '7',cor: Cores.vinho } })}
             />
         
-        </>
+        &lt;/>
         }     
 
-        {funcao &&
-          <>
-            <Botao texto='Criar Banco' cor={Cores.azul} onPress={()=>handleCriarBanco()} />
-            <Botao texto='Apagar Banco' cor={Cores.vermelho} onPress={() => deleteDatabase()} foto='trash-outline'/>
-            <Botao texto='Importar' cor={Cores.vinho} onPress={() =>handleImportar()} foto='download-outline'/>
-            <Carregando visible={loading}/>
-            <Botao texto='Exportar' cor={Cores.caramelo} onPress={() =>handleExportar()} foto='share-outline'/>          
+        {funcao &amp;&amp;
+          &lt;>
+            &lt;Botao texto='Criar Banco' cor={Cores.azul} onPress={()=>handleCriarBanco()} />
+            &lt;Botao texto='Apagar Banco' cor={Cores.vermelho} onPress={() => deleteDatabase()} foto='trash-outline'/>
+            &lt;Botao texto='Importar' cor={Cores.vinho} onPress={() =>handleImportar()} foto='download-outline'/>
+            &lt;Carregando visible={loading}/>
+            &lt;Botao texto='Exportar' cor={Cores.caramelo} onPress={() =>handleExportar()} foto='share-outline'/>          
           
-          </>
+          &lt;/>
           
         }   
 
         {/* ⬇ MODAL DE PREFIXO */}
-        <PrefixoModal
+        &lt;PrefixoModal
           visible={modalVisible}
           onConfirm={handlePrefixoConfirmado}
           onCancel={() => setModalVisible(false)}
         />
        
-      </ViewCenter>
+      &lt;/ViewCenter>
       
-    </View>
+    &lt;/View>
   );
 }
 
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#DropdownComponent">DropdownComponent</a></li><li><a href="global.html#ImportarPlanilhaExcel">ImportarPlanilhaExcel</a></li><li><a href="global.html#associarProdutorCooperativa">associarProdutorCooperativa</a></li><li><a href="global.html#atualizarGenerico">atualizarGenerico</a></li><li><a href="global.html#atualizarPlantacao">atualizarPlantacao</a></li><li><a href="global.html#atualizarProdutor">atualizarProdutor</a></li><li><a href="global.html#buscarPlantacaoPorId">buscarPlantacaoPorId</a></li><li><a href="global.html#buscarPlantacoesDetalhadas">buscarPlantacoesDetalhadas</a></li><li><a href="global.html#buscarProdutorPorId">buscarProdutorPorId</a></li><li><a href="global.html#buscarProdutoresCooperativa">buscarProdutoresCooperativa</a></li><li><a href="global.html#buscarRegistroGenericoPorId">buscarRegistroGenericoPorId</a></li><li><a href="global.html#buscarRegistrosComFiltro">buscarRegistrosComFiltro</a></li><li><a href="global.html#buscarRegistrosGenericos">buscarRegistrosGenericos</a></li><li><a href="global.html#buscarTudoUnificado">buscarTudoUnificado</a></li><li><a href="global.html#createDatabase">createDatabase</a></li><li><a href="global.html#deleteDatabase">deleteDatabase</a></li><li><a href="global.html#excluirGenerico">excluirGenerico</a></li><li><a href="global.html#excluirPlantacao">excluirPlantacao</a></li><li><a href="global.html#excluirProdutor">excluirProdutor</a></li><li><a href="global.html#fs">fs</a></li><li><a href="global.html#inserirGenerico">inserirGenerico</a></li><li><a href="global.html#inserirPlantacao">inserirPlantacao</a></li><li><a href="global.html#inserirProdutor">inserirProdutor</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 30 2025 12:08:10 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

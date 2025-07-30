@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/personalizados/Tabela.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/personalizados/Tabela.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import { Table, Row } from 'react-native-table-component';
+import { RFValue } from 'react-native-responsive-fontsize';
+import Cores from '../../constants/Cores';
+
+/**
+ * Componente Tabela
+ *
+ * Exibe uma tabela rolável horizontalmente com cabeçalho e linhas de dados,
+ * permitindo ocultar colunas específicas e acionar um evento ao clicar em uma linha.
+ *
+ * @component
+ * @param {Array&lt;string>} header - Array com os nomes das colunas do cabeçalho.
+ * @param {Array&lt;Array&lt;any>>} data - Array bidimensional contendo os dados das linhas da tabela.
+ * @param {number} [columnMinWidth=RFValue(100)] - Largura mínima de cada coluna.
+ * @param {Function} [onRowPress=() => {}] - Função chamada ao clicar em uma linha, recebe a linha completa no formato `{ label, value }`.
+ * @param {Array&lt;number>} [hiddenColumns=[]] - Índices das colunas que devem ser ocultadas.
+ * @param {string} [headerColor=Cores.marrom] - Cor de fundo do cabeçalho.
+ *
+ * @example
+ * &lt;Tabela
+ *   header={['ID', 'Nome', 'Email']}
+ *   data={[
+ *     [1, 'João', 'joao@email.com'],
+ *     [2, 'Maria', 'maria@email.com']
+ *   ]}
+ *   columnMinWidth={120}
+ *   hiddenColumns={[0]}
+ *   onRowPress={(row) => console.log('Linha clicada:', row)}
+ * />
+ */
+
+export default function Tabela({
+  header = [],
+  data = [],
+  columnMinWidth = RFValue(100),
+  onRowPress = () => {},
+  hiddenColumns = [],
+  headerColor = Cores.marrom,
+}) {
+  const screenWidth = Dimensions.get('window').width;
+
+  const visibleIndices = header
+    .map((_, index) => index)
+    .filter((index) => !hiddenColumns.includes(index));
+
+  const filteredHeader = header.filter((_, index) =>
+    visibleIndices.includes(index)
+  );
+
+  const filteredData = data.map((row) =>
+    row.filter((_, index) => visibleIndices.includes(index))
+  );
+
+  // 👇 Cálculo inteligente das larguras
+  // ✅ Garante ao menos uma coluna para evitar erro no reduce
+  const widthArr =
+  visibleIndices.length === 0
+    ? [screenWidth - 40]
+    : visibleIndices.length === 1
+    ? [screenWidth - 40]
+    : visibleIndices.map(() => columnMinWidth);
+
+  const totalWidth = widthArr.reduce((sum, w) => sum + w, 0);
+
+
+  return (
+    &lt;View style={styles.wrapper}>
+      &lt;ScrollView horizontal contentContainerStyle={{ width: totalWidth }}>
+        &lt;View style={styles.container}>
+          &lt;Table borderStyle={{ borderWidth: 1, borderColor: '#ccc' }}>
+            &lt;Row
+              data={filteredHeader}
+              style={[styles.head, { backgroundColor: headerColor }]}
+              textStyle={styles.textHead}
+              widthArr={widthArr}
+            />
+
+            {filteredData.length === 0 ? (
+              &lt;Row
+                data={['Nenhum registro encontrado']}
+                style={styles.noDataRow}
+                textStyle={styles.noDataText}
+                widthArr={[totalWidth]}
+              />
+            ) : (
+              filteredData.map((rowData, rowIndex) => (
+                &lt;TouchableOpacity
+                  key={rowIndex}
+                  onPress={() => {
+                    const fullRow = header.map((label, idx) => ({
+                      label,
+                      value: data[rowIndex][idx],
+                    }));
+                    onRowPress(fullRow);
+                  }}
+                >
+                  &lt;Row
+                    data={rowData}
+                    style={[
+                      styles.row,
+                      { backgroundColor: rowIndex % 2 === 0 ? '#f9f9f9' : '#e6f2ff' },
+                    ]}
+                    textStyle={styles.textRow}
+                    widthArr={widthArr}
+                  />
+                &lt;/TouchableOpacity>
+              ))
+            )}
+          &lt;/Table>
+        &lt;/View>
+      &lt;/ScrollView>
+    &lt;/View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  head: {
+    height: RFValue(40),
+  },
+  textHead: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: RFValue(13),
+    color: '#fff',
+  },
+  row: {
+    minHeight: RFValue(35),
+    alignItems: 'center',
+  },
+  textRow: {
+    textAlign: 'center',
+    fontSize: RFValue(12),
+    flexWrap: 'wrap',
+    paddingHorizontal: 5,
+  },
+  noDataRow: {
+    height: RFValue(35),
+    backgroundColor: '#fff',
+  },
+  noDataText: {
+    textAlign: 'center',
+    fontStyle: 'italic',
+    color: '#777',
+    fontSize: RFValue(12),
+  },
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#DropdownComponent">DropdownComponent</a></li><li><a href="global.html#ImportarPlanilhaExcel">ImportarPlanilhaExcel</a></li><li><a href="global.html#associarProdutorCooperativa">associarProdutorCooperativa</a></li><li><a href="global.html#atualizarGenerico">atualizarGenerico</a></li><li><a href="global.html#atualizarPlantacao">atualizarPlantacao</a></li><li><a href="global.html#atualizarProdutor">atualizarProdutor</a></li><li><a href="global.html#buscarPlantacaoPorId">buscarPlantacaoPorId</a></li><li><a href="global.html#buscarPlantacoesDetalhadas">buscarPlantacoesDetalhadas</a></li><li><a href="global.html#buscarProdutorPorId">buscarProdutorPorId</a></li><li><a href="global.html#buscarProdutoresCooperativa">buscarProdutoresCooperativa</a></li><li><a href="global.html#buscarRegistroGenericoPorId">buscarRegistroGenericoPorId</a></li><li><a href="global.html#buscarRegistrosComFiltro">buscarRegistrosComFiltro</a></li><li><a href="global.html#buscarRegistrosGenericos">buscarRegistrosGenericos</a></li><li><a href="global.html#buscarTudoUnificado">buscarTudoUnificado</a></li><li><a href="global.html#createDatabase">createDatabase</a></li><li><a href="global.html#deleteDatabase">deleteDatabase</a></li><li><a href="global.html#excluirGenerico">excluirGenerico</a></li><li><a href="global.html#excluirPlantacao">excluirPlantacao</a></li><li><a href="global.html#excluirProdutor">excluirProdutor</a></li><li><a href="global.html#fs">fs</a></li><li><a href="global.html#inserirGenerico">inserirGenerico</a></li><li><a href="global.html#inserirPlantacao">inserirPlantacao</a></li><li><a href="global.html#inserirProdutor">inserirProdutor</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 30 2025 12:08:10 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

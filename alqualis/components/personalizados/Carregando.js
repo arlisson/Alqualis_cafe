@@ -6,7 +6,7 @@ import { View, ActivityIndicator, Text, StyleSheet, Modal } from 'react-native';
  * 
  * @param {*} visible Visibilidade do modal
  * @param {*} message Mensagem a ser exibida
- * @returns 
+ * 
  */
 export default function Carregando({ visible, message = "Importando dados..." }) {
   return (

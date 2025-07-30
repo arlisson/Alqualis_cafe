@@ -7,7 +7,10 @@ import Cores from '../constants/Cores';
 import Botao from '../components/personalizados/Botao';
 import ViewCenter from '../components/personalizados/ViewCenter'
 import { router } from 'expo-router';
-
+/**
+ * 
+ * @description Tela inicial do APP
+ */
 export default function Index() {  
 
   

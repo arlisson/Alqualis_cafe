@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/personalizados/headerTtitle.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/personalizados/headerTtitle.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import Cor from '../../constants/Cores';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { RFValue } from 'react-native-responsive-fontsize';
+
+
+/**
+ * HeaderTitle
+ * 
+ * Componente de cabeçalho reutilizável com título centralizado
+ * e ícones opcionais de navegação (voltar e home).
+ * 
+ * @param {Object} props - Propriedades do componente
+ * @param {string} props.texto - Texto a ser exibido como título centralizado (padrão: 'Título')
+ * @param {boolean} props.voltar - Se verdadeiro, exibe o botão de voltar (router.back())
+ * @param {boolean} props.home - Se verdadeiro, exibe o botão de home (router.push('/'))
+ * 
+ * @returns {JSX.Element} Um cabeçalho estilizado com título e ícones opcionais
+ * 
+ * @example
+ * &lt;HeaderTitle texto="Gestão do Café" voltar='true' home='false' />
+ */
+export default function HeaderTitle({
+  texto = 'Título',
+  voltar = false,
+  home = false,
+}) {
+  return (
+    &lt;View style={styles.header}>
+      {/* Ícone de Voltar */}
+      &lt;View style={styles.iconLeft}>
+        {voltar &amp;&amp; (
+          &lt;TouchableOpacity onPress={() => router.back()}>
+            &lt;Ionicons name="arrow-back" size={RFValue(20)} color="#F3E8DF" />
+          &lt;/TouchableOpacity>
+        )}
+      &lt;/View>
+
+      {/* Título centralizado */}
+      &lt;View style={styles.titleContainer}>
+        &lt;Text style={styles.title}>{texto}&lt;/Text>
+      &lt;/View>
+
+      {/* Ícone de Home */}
+      &lt;View style={styles.iconRight}>
+        {home &amp;&amp; (
+          &lt;TouchableOpacity onPress={() => router.push('/')}>
+            &lt;Ionicons name="home" size={RFValue(20)} color="#F3E8DF" />
+          &lt;/TouchableOpacity>
+        )}
+      &lt;/View>
+    &lt;/View>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: {
+    backgroundColor: Cor.marrom,
+    paddingTop: RFValue(40),
+    paddingBottom: RFValue(16),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    paddingHorizontal: 16,
+  },
+  iconLeft: {
+    width: RFValue(40),
+    alignItems: 'flex-start',
+  },
+  iconRight: {
+    width: RFValue(40),
+    alignItems: 'flex-end',
+  },
+  titleContainer: {
+    flex: 1,
+    alignItems: 'center',
+    
+  },
+  title: {
+    color: '#F3E8DF',
+    fontSize: RFValue(18),
+    fontWeight: 'bold',
+    textAlign:'center'
+  },
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#DropdownComponent">DropdownComponent</a></li><li><a href="global.html#ImportarPlanilhaExcel">ImportarPlanilhaExcel</a></li><li><a href="global.html#associarProdutorCooperativa">associarProdutorCooperativa</a></li><li><a href="global.html#atualizarGenerico">atualizarGenerico</a></li><li><a href="global.html#atualizarPlantacao">atualizarPlantacao</a></li><li><a href="global.html#atualizarProdutor">atualizarProdutor</a></li><li><a href="global.html#buscarPlantacaoPorId">buscarPlantacaoPorId</a></li><li><a href="global.html#buscarPlantacoesDetalhadas">buscarPlantacoesDetalhadas</a></li><li><a href="global.html#buscarProdutorPorId">buscarProdutorPorId</a></li><li><a href="global.html#buscarProdutoresCooperativa">buscarProdutoresCooperativa</a></li><li><a href="global.html#buscarRegistroGenericoPorId">buscarRegistroGenericoPorId</a></li><li><a href="global.html#buscarRegistrosComFiltro">buscarRegistrosComFiltro</a></li><li><a href="global.html#buscarRegistrosGenericos">buscarRegistrosGenericos</a></li><li><a href="global.html#buscarTudoUnificado">buscarTudoUnificado</a></li><li><a href="global.html#createDatabase">createDatabase</a></li><li><a href="global.html#deleteDatabase">deleteDatabase</a></li><li><a href="global.html#excluirGenerico">excluirGenerico</a></li><li><a href="global.html#excluirPlantacao">excluirPlantacao</a></li><li><a href="global.html#excluirProdutor">excluirProdutor</a></li><li><a href="global.html#fs">fs</a></li><li><a href="global.html#inserirGenerico">inserirGenerico</a></li><li><a href="global.html#inserirPlantacao">inserirPlantacao</a></li><li><a href="global.html#inserirProdutor">inserirProdutor</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Wed Jul 30 2025 12:08:10 GMT-0300 (Horário Padrão de Brasília)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

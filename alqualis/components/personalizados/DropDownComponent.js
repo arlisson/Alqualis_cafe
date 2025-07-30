@@ -19,7 +19,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
  * @param {*} label Título do Dropdown
  * @param {*} onChange Função acionada quando o valor selecionado muda
  * @param {*} value Valor selecionado, exemplo: { label: 'Item 1', value: '1' }
- * @returns 
+ *  
  */
   const DropdownComponent = ({ data = [], label = 'Selecionar', onChange, value }) => {
   const [isFocus, setIsFocus] = useState(false);
