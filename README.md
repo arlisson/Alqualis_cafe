@@ -111,4 +111,4 @@ O diagrama de entidade e relacionamento descreve como o banco de dados será mod
 * Desenvolver os módulos em forma de aplicação mobile, sempre validando com o cliente **(MVP Concluído)**.
 
 # Documentação do Código
-A documentação JsDoc pode ser encontrada [aqui](https://github.com/arlisson/Alqualis_cafe/blob/main/alqualis/docs/index.html)
+A documentação JsDoc pode ser encontrada [aqui](https://arlisson.github.io/Alqualis_cafe/alqualis/docs/)
